@@ -8,19 +8,23 @@ import lombok.Data;
 @Entity
 @Table(name = "usuarios")
 @Data
+@Inheritance(strategy = InheritanceType.JOINED)
 public class UsuarioModelo {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String nome;
-    private String email;
-    private String senha;
+    protected Long id;
+    protected String nome;
+
+    @Column(unique =  true)
+    protected String email;
+    
+    protected String senha;
     
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_criacao", nullable = false, updatable = false)
     @CreatedDate
-    private Date dataCriacao;
+    protected Date dataCriacao;
 
     public UsuarioModelo() {
         this.dataCriacao = new Date(); 
