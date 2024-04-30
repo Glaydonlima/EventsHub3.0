@@ -17,17 +17,17 @@ import lombok.Data;
 @Data
 @Table(name = "servicos")
 public class ServicoModelo {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String categoria;
     private String subcategoria;
     private String titulo;
     private String descricao;
     private double preco;
-    
+
     @ManyToOne
     @JoinColumn(name = "prestador_id")
     private PrestadorModelo prestador;
@@ -36,6 +36,6 @@ public class ServicoModelo {
     private List<SolicitacaoModelo> solicitacoes;
 
     @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
-    private List<PagamentoModelo> pagamentos;    
+    private List<PagamentoModelo> pagamentos;
 
 }

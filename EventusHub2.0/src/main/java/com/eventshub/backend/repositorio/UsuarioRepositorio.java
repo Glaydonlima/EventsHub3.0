@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.eventshub.backend.modelo.UsuarioModelo;
 
 @Repository
-public interface UsuarioRepositorio extends CrudRepository<UsuarioModelo, Long>{
-    
+public interface UsuarioRepositorio extends CrudRepository<UsuarioModelo, Long> {
+
 }

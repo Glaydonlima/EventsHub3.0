@@ -17,27 +17,28 @@ import lombok.Data;
 @Data
 @Table(name = "pagamentos")
 public class PagamentoModelo {
-     @Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private double valorPago;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dataPagamento;
-    
+
     private String formaPagamento;
-    
+
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private ClienteModelo cliente;
-    
+
     @ManyToOne
     @JoinColumn(name = "prestador_id")
     private PrestadorModelo prestador;
-    
+
     @ManyToOne
     @JoinColumn(name = "servico_id")
     private ServicoModelo servico;
-    
+
 }

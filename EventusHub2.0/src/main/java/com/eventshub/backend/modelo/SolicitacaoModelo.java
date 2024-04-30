@@ -13,18 +13,17 @@ import lombok.Data;
 @Data
 @Table(name = "solicitacoes")
 public class SolicitacaoModelo {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne
     @JoinColumn(name = "servico_id")
     private ServicoModelo servico;
-    
+
     private double valorTotal;
     private String prazoEntrega;
     private String formaPagamento;
-
 
 }

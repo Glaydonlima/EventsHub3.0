@@ -7,5 +7,5 @@ import com.eventshub.backend.modelo.ServicoModelo;
 
 @Repository
 public interface ServicoRepositorio extends CrudRepository<ServicoModelo, Long> {
-    
+
 }

@@ -12,43 +12,43 @@ import com.eventshub.backend.repositorio.UsuarioRepositorio;
 @Service
 public class UsuarioServico {
 
-    @Autowired
-    private UsuarioRepositorio ur;
+  @Autowired
+  private UsuarioRepositorio usuarioRepositorio;
 
-    @Autowired
-    private RespostaModelo rm;
+  @Autowired
+  private RespostaModelo respostaModelo;
 
-    
-  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo um, String acao){
 
-    if(um.getNome().equals("")){
-      rm.setMensagem("O nome do produto é obrigatorio!");
-      return new ResponseEntity<RespostaModelo>(rm, HttpStatus.BAD_REQUEST);
-    }else if(um.getEmail().equals("")){
-      rm.setMensagem("O Email é obrigatorio!");
-      return new ResponseEntity<RespostaModelo>(rm, HttpStatus.BAD_REQUEST);
+  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo um, String acao) {
+
+    if (um.getNome().equals("")) {
+      respostaModelo.setMensagem("O nome do produto é obrigatorio!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    } else if (um.getEmail().equals("")) {
+      respostaModelo.setMensagem("O Email é obrigatorio!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    } else if (um.getSenha().equals("")) {
+      respostaModelo.setMensagem("A senha é obrigatoria!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
     }
-    else if(um.getSenha().equals("")){
-        rm.setMensagem("A senha é obrigatoria!");
-        return new ResponseEntity<RespostaModelo>(rm, HttpStatus.BAD_REQUEST);}
 
-        return new ResponseEntity<UsuarioModelo>(ur.save(um), HttpStatus.CREATED);
-      
-    }
-  
-
-  public ResponseEntity<RespostaModelo> remover(long id){
-
-    ur.deleteById(id);
-
-    rm.setMensagem("O produto foi removido com sucesso");
-    return new ResponseEntity<RespostaModelo>(rm, HttpStatus.OK);
+    return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(um), HttpStatus.CREATED);
 
   }
 
 
-    public Iterable<UsuarioModelo> listar(){
-        return ur.findAll();
-      }
+  public ResponseEntity<RespostaModelo> remover(long id) {
+
+    usuarioRepositorio.deleteById(id);
+
+    respostaModelo.setMensagem("O produto foi removido com sucesso");
+    return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.OK);
+
+  }
+
+
+  public Iterable<UsuarioModelo> listar() {
+    return usuarioRepositorio.findAll();
+  }
 
 }

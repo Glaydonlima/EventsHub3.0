@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.eventshub.backend.modelo.PrestadorModelo;
 
 @Repository
-public interface PrestadorRepositorio  extends CrudRepository<PrestadorModelo, Long>{
-    
+public interface PrestadorRepositorio extends CrudRepository<PrestadorModelo, Long> {
+
 }

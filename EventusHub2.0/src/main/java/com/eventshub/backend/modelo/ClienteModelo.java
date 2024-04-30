@@ -16,13 +16,13 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class ClienteModelo extends UsuarioModelo{
+public class ClienteModelo extends UsuarioModelo {
 
     private String endereco;
     private String telefone;
     private Date dataNascimento;
 
-     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<PagamentoModelo> pagamentos;
 
 }

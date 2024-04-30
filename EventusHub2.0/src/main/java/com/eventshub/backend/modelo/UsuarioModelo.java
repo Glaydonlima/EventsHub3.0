@@ -10,25 +10,24 @@ import lombok.Data;
 @Data
 @Inheritance(strategy = InheritanceType.JOINED)
 public class UsuarioModelo {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
-    protected String nome;
+    private Long id;
+    private String nome;
 
-    @Column(unique =  true)
-    protected String email;
-    
-    protected String senha;
-    
+    @Column(unique = true)
+    private String email;
+
+    private String senha;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "data_criacao", nullable = false, updatable = false)
     @CreatedDate
-    protected Date dataCriacao;
+    private Date dataCriacao;
 
     public UsuarioModelo() {
-        this.dataCriacao = new Date(); 
+        this.dataCriacao = new Date();
     }
-    
 
 }

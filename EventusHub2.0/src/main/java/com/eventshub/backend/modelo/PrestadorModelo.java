@@ -12,8 +12,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class PrestadorModelo extends UsuarioModelo  {
-    
+public class PrestadorModelo extends UsuarioModelo {
+
     private String razaoSocial;
     private String cnpj;
     private String descricaoEmpresa;
@@ -26,6 +26,5 @@ public class PrestadorModelo extends UsuarioModelo  {
     private List<PagamentoModelo> pagamentos;
 
 }
-
 
 
