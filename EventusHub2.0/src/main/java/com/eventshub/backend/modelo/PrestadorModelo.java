@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 
 @Entity
-@Table(name = "prestador")
+@Table(name = "prestadores")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
