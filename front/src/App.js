@@ -11,6 +11,7 @@ function App() {
   };
 
   const [objUsuario, setObjUsuario] = useState(usuario);
+  const [usuarios, setUsuarios] = useState([]);
 
   const aoDigitar = (e) => {
     setObjUsuario({ ...objUsuario, [e.target.name]: e.target.value });
@@ -27,13 +28,27 @@ function App() {
     })
       .then((retorno) => retorno.json())
       .then((retorno_convertido) => {
-        console.log(retorno_convertido);
+        if (retorno_convertido.mensagem !== undefined) {
+          alert(retorno_convertido.mensagem);
+        } else {
+          setUsuarios([...usuarios, retorno_convertido]);
+          alert("Usuario cadastrado com sucesso!");
+          limparFormulario();
+        }
       });
+  };
+
+  const limparFormulario = () => {
+    setObjUsuario(usuario);
   };
 
   return (
     <div className="App">
-      <Usuario eventoTeclado={aoDigitar} cadastrar={cadastrar}></Usuario>
+      <Usuario
+        obj={objUsuario}
+        eventoTeclado={aoDigitar}
+        cadastrar={cadastrar}
+      ></Usuario>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Usuario({ eventoTeclado, cadastrar }) {
+function Usuario({ eventoTeclado, cadastrar, obj }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -11,6 +11,7 @@ function Usuario({ eventoTeclado, cadastrar }) {
     <form>
       <input
         type="text"
+        value={obj.nome}
         name="nome"
         onChange={eventoTeclado}
         placeholder="Nome"
@@ -19,6 +20,7 @@ function Usuario({ eventoTeclado, cadastrar }) {
       <input
         type="text"
         name="email"
+        value={obj.email}
         onChange={eventoTeclado}
         placeholder="Email"
         className="form-control"
@@ -27,6 +29,7 @@ function Usuario({ eventoTeclado, cadastrar }) {
         <input
           type={showPassword ? "text" : "password"}
           onChange={eventoTeclado}
+          value={obj.senha}
           name="senha"
           placeholder="Senha"
           className="form-control"
