@@ -19,20 +19,20 @@ public class UsuarioServico {
   private RespostaModelo respostaModelo;
 
 
-  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo um, String acao) {
+  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao) {
 
-    if (um.getNome().equals("")) {
+    if (usuarioModelo.getNome().equals("")) {
       respostaModelo.setMensagem("O nome do produto é obrigatorio!");
       return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    } else if (um.getEmail().equals("")) {
+    } else if (usuarioModelo.getEmail().equals("")) {
       respostaModelo.setMensagem("O Email é obrigatorio!");
       return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    } else if (um.getSenha().equals("")) {
+    } else if (usuarioModelo.getSenha().equals("")) {
       respostaModelo.setMensagem("A senha é obrigatoria!");
       return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
     }
 
-    return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(um), HttpStatus.CREATED);
+    return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED);
 
   }
 

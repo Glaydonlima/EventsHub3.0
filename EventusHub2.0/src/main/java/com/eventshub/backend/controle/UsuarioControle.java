@@ -23,27 +23,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UsuarioControle {
     
     @Autowired
-    private UsuarioServico us;
+    private UsuarioServico usuarioServico;
 
     @DeleteMapping("remover/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id){
-    return us.remover(id);
+    return usuarioServico.remover(id);
   }
 
   @PutMapping("alterar")
-  public ResponseEntity<?> alterar(@RequestBody UsuarioModelo pm){
-    return us.cadastrarAlterar(pm, "alterar");
+  public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo){
+    return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar");
   }
 
     
     @PostMapping("cadastrar")
-  public ResponseEntity<?> cadastar(@RequestBody UsuarioModelo um){
-    return us.cadastrarAlterar(um, "cadastrar");
+  public ResponseEntity<?> cadastar(@RequestBody UsuarioModelo usuarioModelo){
+    return usuarioServico.cadastrarAlterar(usuarioModelo, "cadastrar");
   }
 
     @GetMapping("listar")
     public Iterable<UsuarioModelo> listar(){
-        return us.listar();
+        return usuarioServico.listar();
     }
     
 
