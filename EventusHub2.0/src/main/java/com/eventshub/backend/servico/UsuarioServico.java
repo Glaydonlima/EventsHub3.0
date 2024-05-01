@@ -20,25 +20,45 @@ public class UsuarioServico {
   private RespostaModelo respostaModelo;
 
 
-  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao) {
-
-    if (usuarioModelo.getNome().equals("")) {
-      respostaModelo.setMensagem("O nome do produto é obrigatorio!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    } else if (usuarioModelo.getEmail().equals("")) {
-      respostaModelo.setMensagem("O Email é obrigatorio!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    } else if (usuarioModelo.getSenha().equals("")) {
-      respostaModelo.setMensagem("A senha é obrigatoria!");
+  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
+    if (acao.equals("cadastrar")) {
+      if (usuarioModelo.getNome() == null || usuarioModelo.getNome().isEmpty()) {
+        respostaModelo.setMensagem("O nome do produto é obrigatório!");
+        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+      } else if (usuarioModelo.getEmail() == null || usuarioModelo.getEmail().isEmpty()) {
+        respostaModelo.setMensagem("O Email é obrigatório!");
+        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+      } else if (usuarioModelo.getSenha() == null || usuarioModelo.getSenha().isEmpty()) {
+        respostaModelo.setMensagem("A senha é obrigatória!");
+        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+      }
+      String senha = usuarioModelo.getSenha();
+      usuarioModelo.setSenha(CriptoServico.criptografar(senha));
+      return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo),
+          HttpStatus.CREATED);
+    } else if (acao.equals("alterar")) {
+      Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(id);
+      if (usuarioExistente.isPresent()) {
+        UsuarioModelo usuarioExistenteAtualizado = usuarioExistente.get();
+        if (usuarioModelo.getNome() != null && !usuarioModelo.getNome().isEmpty()) {
+          usuarioExistenteAtualizado.setNome(usuarioModelo.getNome());
+        }
+        if (usuarioModelo.getEmail() != null && !usuarioModelo.getEmail().isEmpty()) {
+          usuarioExistenteAtualizado.setEmail(usuarioModelo.getEmail());
+        }
+        if (usuarioModelo.getSenha() != null && !usuarioModelo.getSenha().isEmpty()) {
+          String senha = usuarioModelo.getSenha();
+          usuarioExistenteAtualizado.setSenha(CriptoServico.criptografar(senha));
+        }
+        return new ResponseEntity<UsuarioModelo>(
+            usuarioRepositorio.save(usuarioExistenteAtualizado), HttpStatus.OK);
+      } else {
+        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.NOT_FOUND);
+      }
+    } else {
+      respostaModelo.setMensagem("Ação inválida!");
       return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
     }
-
-    String senha = usuarioModelo.getSenha();
-    usuarioModelo.setSenha(CriptoServico.criptografar(senha));
-
-    return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo),
-        HttpStatus.CREATED);
-
   }
 
   public ResponseEntity<RespostaModelo> remover(long id) {

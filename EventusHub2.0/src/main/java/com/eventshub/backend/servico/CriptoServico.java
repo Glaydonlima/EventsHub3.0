@@ -9,7 +9,6 @@ public class CriptoServico {
   private static final StrongTextEncryptor criptografador;
 
   static {
-
     criptografador = new StrongTextEncryptor();
     criptografador.setPassword("123");
   }
@@ -21,6 +20,5 @@ public class CriptoServico {
   public static String descriptografar(String textoCriptografado) {
     return criptografador.decrypt(textoCriptografado);
   }
-
 
 }

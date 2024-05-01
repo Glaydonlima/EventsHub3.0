@@ -21,30 +21,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @CrossOrigin(origins = "*")
 @RequestMapping("/usuario")
 public class UsuarioControle {
-    
-    @Autowired
-    private UsuarioServico usuarioServico;
 
-    @DeleteMapping("remover/{id}")
-  public ResponseEntity<RespostaModelo> remover(@PathVariable long id){
+  @Autowired
+  private UsuarioServico usuarioServico;
+
+  @DeleteMapping("remover/{id}")
+  public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
     return usuarioServico.remover(id);
   }
 
-  @PutMapping("alterar")
-  public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo){
-    return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar");
+  @PutMapping("alterar/{id}")
+  public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo,
+      @PathVariable Long id) {
+    return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar", id);
   }
 
-    
-    @PostMapping("cadastrar")
-  public ResponseEntity<?> cadastar(@RequestBody UsuarioModelo usuarioModelo){
-    return usuarioServico.cadastrarAlterar(usuarioModelo, "cadastrar");
+
+  @PostMapping("cadastrar")
+  public ResponseEntity<?> cadastar(@RequestBody UsuarioModelo usuarioModelo) {
+    return usuarioServico.cadastrarAlterar(usuarioModelo, "cadastrar", null);
   }
 
-    @GetMapping("listar")
-    public Iterable<UsuarioModelo> listar(){
-        return usuarioServico.listar();
-    }
-    
+  @GetMapping("listar")
+  public Iterable<UsuarioModelo> listar() {
+    return usuarioServico.listar();
+  }
+
 
 }
