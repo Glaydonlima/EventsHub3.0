@@ -1,5 +1,6 @@
 package com.eventshub.backend.servico;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,20 +33,24 @@ public class UsuarioServico {
       return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
     }
 
-    return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED);
+    String senha = usuarioModelo.getSenha();
+    usuarioModelo.setSenha(CriptoServico.criptografar(senha));
+
+    return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo),
+        HttpStatus.CREATED);
 
   }
-
 
   public ResponseEntity<RespostaModelo> remover(long id) {
-
-    usuarioRepositorio.deleteById(id);
-
-    respostaModelo.setMensagem("O produto foi removido com sucesso");
-    return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.OK);
-
+    if (usuarioRepositorio.existsById(id)) {
+      usuarioRepositorio.deleteById(id);
+      respostaModelo.setMensagem("O usuario foi removido com sucesso");
+      return new ResponseEntity<>(respostaModelo, HttpStatus.OK);
+    } else {
+      respostaModelo.setMensagem("Usuario não encontrado");
+      return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
+    }
   }
-
 
   public Iterable<UsuarioModelo> listar() {
     return usuarioRepositorio.findAll();

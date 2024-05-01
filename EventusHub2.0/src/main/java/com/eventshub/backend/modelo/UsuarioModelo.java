@@ -18,7 +18,7 @@ public class UsuarioModelo {
 
     @Column(unique = true)
     private String email;
-
+    
     private String senha;
 
     @Temporal(TemporalType.TIMESTAMP)
