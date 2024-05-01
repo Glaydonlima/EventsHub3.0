@@ -35,7 +35,7 @@ function Usuario({ eventoTeclado, cadastrar, obj }) {
           className="form-control"
           id="password "
         />
-        <button type="button" onClick={togglePasswordVisibility}>
+        <button type="button" className="btn btn-primary mb-2"onClick={togglePasswordVisibility}>
           {showPassword ? "Ocultar" : "Mostrar"}
         </button>
       </div>

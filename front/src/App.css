@@ -18,6 +18,9 @@ form input[type="button"] {
 
 .password-container {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #togglePassword {
