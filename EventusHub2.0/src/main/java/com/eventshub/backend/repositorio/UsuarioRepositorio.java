@@ -7,5 +7,5 @@ import com.eventshub.backend.modelo.UsuarioModelo;
 
 @Repository
 public interface UsuarioRepositorio extends CrudRepository<UsuarioModelo, Long> {
-
+  boolean existsByEmail(String email);
 }

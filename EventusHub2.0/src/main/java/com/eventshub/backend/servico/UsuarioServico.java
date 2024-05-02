@@ -19,23 +19,44 @@ public class UsuarioServico {
   @Autowired
   private RespostaModelo respostaModelo;
 
+  /*
+   * public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
+   * if (acao.equals("cadastrar")) { if (usuarioModelo.getNome() == null ||
+   * usuarioModelo.getNome().isEmpty()) {
+   * respostaModelo.setMensagem("O nome do produto é obrigatório!"); return new
+   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } else if
+   * (usuarioModelo.getEmail() == null || usuarioModelo.getEmail().isEmpty()) {
+   * respostaModelo.setMensagem("O Email é obrigatório!"); return new
+   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } else if
+   * (usuarioModelo.getSenha() == null || usuarioModelo.getSenha().isEmpty()) {
+   * respostaModelo.setMensagem("A senha é obrigatória!"); return new
+   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } if
+   * (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
+   * respostaModelo.setMensagem("O email já está cadastrado!"); return new
+   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } String senha =
+   * usuarioModelo.getSenha(); usuarioModelo.setSenha(CriptoServico.criptografar(senha)); return new
+   * ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED); }
+   * else if (acao.equals("alterar")) { Optional<UsuarioModelo> usuarioExistente =
+   * usuarioRepositorio.findById(id); if (usuarioExistente.isPresent()) { UsuarioModelo
+   * usuarioExistenteAtualizado = usuarioExistente.get(); if (usuarioModelo.getNome() != null &&
+   * !usuarioModelo.getNome().isEmpty()) {
+   * usuarioExistenteAtualizado.setNome(usuarioModelo.getNome()); } if (usuarioModelo.getEmail() !=
+   * null && !usuarioModelo.getEmail().isEmpty()) {
+   * usuarioExistenteAtualizado.setEmail(usuarioModelo.getEmail()); } if (usuarioModelo.getSenha()
+   * != null && !usuarioModelo.getSenha().isEmpty()) { String senha = usuarioModelo.getSenha();
+   * usuarioExistenteAtualizado.setSenha(CriptoServico.criptografar(senha)); } if
+   * (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
+   * respostaModelo.setMensagem("O email já está cadastrado!"); return new
+   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } return new
+   * ResponseEntity<UsuarioModelo>( usuarioRepositorio.save(usuarioExistenteAtualizado),
+   * HttpStatus.OK); } else { return new ResponseEntity<RespostaModelo>(respostaModelo,
+   * HttpStatus.NOT_FOUND); } } else { respostaModelo.setMensagem("Ação inválida!"); return new
+   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } }
+   */
 
   public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
     if (acao.equals("cadastrar")) {
-      if (usuarioModelo.getNome() == null || usuarioModelo.getNome().isEmpty()) {
-        respostaModelo.setMensagem("O nome do produto é obrigatório!");
-        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-      } else if (usuarioModelo.getEmail() == null || usuarioModelo.getEmail().isEmpty()) {
-        respostaModelo.setMensagem("O Email é obrigatório!");
-        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-      } else if (usuarioModelo.getSenha() == null || usuarioModelo.getSenha().isEmpty()) {
-        respostaModelo.setMensagem("A senha é obrigatória!");
-        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-      }
-      String senha = usuarioModelo.getSenha();
-      usuarioModelo.setSenha(CriptoServico.criptografar(senha));
-      return new ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo),
-          HttpStatus.CREATED);
+      return new ResponseEntity<>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED);
     } else if (acao.equals("alterar")) {
       Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(id);
       if (usuarioExistente.isPresent()) {
@@ -50,6 +71,10 @@ public class UsuarioServico {
           String senha = usuarioModelo.getSenha();
           usuarioExistenteAtualizado.setSenha(CriptoServico.criptografar(senha));
         }
+        if (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
+          respostaModelo.setMensagem("O email já está cadastrado!");
+          return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<UsuarioModelo>(
             usuarioRepositorio.save(usuarioExistenteAtualizado), HttpStatus.OK);
       } else {
@@ -57,7 +82,7 @@ public class UsuarioServico {
       }
     } else {
       respostaModelo.setMensagem("Ação inválida!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
     }
   }
 

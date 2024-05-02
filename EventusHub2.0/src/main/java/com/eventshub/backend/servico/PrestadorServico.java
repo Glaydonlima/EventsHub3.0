@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.eventshub.backend.modelo.PrestadorModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
+import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.PrestadorRepositorio;
+import com.eventshub.backend.repositorio.UsuarioRepositorio;
 
 @Service
 public class PrestadorServico {
@@ -17,21 +19,43 @@ public class PrestadorServico {
   @Autowired
   private RespostaModelo respostaModelo;
 
-  public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao) {
-    Optional<PrestadorModelo> prestadorExistente =
-        prestadorRepositorio.findById(prestadorModelo.getId());
-    if (prestadorExistente.isPresent() && acao.equalsIgnoreCase("cadastrar")) {
-      respostaModelo.setMensagem("Prestador já cadastrado");
-      return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
-    }
+  @Autowired
+  private UsuarioRepositorio usuarioRepositorio;
 
-    if (!prestadorExistente.isPresent() && acao.equalsIgnoreCase("alterar")) {
-      respostaModelo.setMensagem("Prestador não encontrado");
-      return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
+
+  public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao,
+      Long idUsuario) {
+    if (prestadorModelo.getRazaoSocial() == null || prestadorModelo.getRazaoSocial().isEmpty()) {
+      respostaModelo.setMensagem("A razão social é obrigatória!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
     }
-    return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
-        HttpStatus.CREATED);
+    if (prestadorModelo.getCpf() == null || prestadorModelo.getCpf().isEmpty()) {
+      respostaModelo.setMensagem("O Cpf ou Cnpj é obrigatório!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    }
+    if (prestadorModelo.getDescricaoEmpresa() == null
+        || prestadorModelo.getDescricaoEmpresa().isEmpty()) {
+      respostaModelo.setMensagem("A descrição da empresa é obrigatória!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    }
+    if (prestadorRepositorio.existsByCpf(prestadorModelo.getCpf())) {
+      respostaModelo.setMensagem("O Cpf ou Cnpj já está em uso!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    }
+    if (acao.equalsIgnoreCase("cadastrar")) {
+      UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
+          .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+      prestadorModelo.setUsuario(usuario);
+      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
+          HttpStatus.OK);
+    } else if (acao.equalsIgnoreCase("alterar")) {
+      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
+          HttpStatus.OK);
+    } else {
+      return ResponseEntity.badRequest().body("Ação inválida");
+    }
   }
+
 
   public ResponseEntity<RespostaModelo> remover(long id) {
     if (prestadorRepositorio.existsById(id)) {
@@ -48,4 +72,12 @@ public class PrestadorServico {
     return prestadorRepositorio.findAll();
   }
 
+  public ResponseEntity<?> buscarPorId(Long id) {
+    Optional<PrestadorModelo> prestador = prestadorRepositorio.findById(id);
+    if (prestador.isPresent()) {
+      return new ResponseEntity<>(prestador.get(), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+  }
 }

@@ -2,22 +2,38 @@ package com.eventshub.backend.modelo;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
 @Table(name = "prestadores")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
-public class PrestadorModelo extends UsuarioModelo {
+@NoArgsConstructor
+public class PrestadorModelo {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "A razão social é obrigatória")
     private String razaoSocial;
-    private String cnpj;
+
+    @Column(unique = true)
+    @NotBlank(message = "CPF é obrigatório")
+    private String cpf;
+
+    @NotBlank(message = "A descrição da empresa é obrigatória")
     private String descricaoEmpresa;
+
     private String portfolio;
+
+    @OneToOne
+    @JoinColumn(name = "usuario_id")
+    private UsuarioModelo usuario;
 
     @OneToMany(mappedBy = "prestador", cascade = CascadeType.ALL)
     private List<ServicoModelo> servicos;
