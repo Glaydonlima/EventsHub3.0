@@ -28,7 +28,7 @@ public class ClienteServico {
     if (acao.equals("cadastrar")) {
         UsuarioModelo usuario = usuarioRepositorio.findById(id)
           .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-      clienteModelo.setUsuario(usuario);
+      clienteModelo.setId(usuario.getId());
       return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
     } else if (acao.equals("alterar")) {
       Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(id);

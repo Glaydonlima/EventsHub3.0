@@ -2,12 +2,7 @@ package com.eventshub.backend.modelo;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,11 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class ClienteModelo {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ClienteModelo extends UsuarioModelo {
 
     @NotBlank(message = "O endereço não pode estar em branco")
     private String endereco;
@@ -42,10 +33,6 @@ public class ClienteModelo {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     @NotNull(message = "A data de nascimento não pode estar em branco")
     private Date dataNascimento;
-
-    @OneToOne
-    @JoinColumn(name = "usuario_id")
-    private UsuarioModelo usuario;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<PagamentoModelo> pagamentos;
