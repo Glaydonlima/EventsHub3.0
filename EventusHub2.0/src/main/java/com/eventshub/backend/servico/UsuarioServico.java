@@ -56,6 +56,7 @@ public class UsuarioServico {
 
   public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
     if (acao.equals("cadastrar")) {
+      usuarioModelo.setSenha(CriptoServico.criptografar(usuarioModelo.getSenha()));
       return new ResponseEntity<>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED);
     } else if (acao.equals("alterar")) {
       Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(id);
