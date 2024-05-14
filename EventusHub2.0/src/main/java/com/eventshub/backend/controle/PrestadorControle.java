@@ -45,6 +45,12 @@ public class PrestadorControle {
   public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
     return prestadorServico.buscarPorId(id);
   }
+
+  @GetMapping("/listar")
+  public Iterable<PrestadorModelo> listarClientes() {
+    return prestadorServico.listar();
+  }
+
 }
 
 
