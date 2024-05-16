@@ -5,16 +5,20 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.eventshub.backend.dto.LoginRequestDTO;
+import com.eventshub.backend.dto.ResponseDTO;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
+import com.eventshub.backend.repositorio.UsuarioRepositorio;
 import com.eventshub.backend.servico.UsuarioServico;
+import com.eventshub.backend.servico.seguranca.TokenServico;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +36,26 @@ public class UsuarioControle {
 
   @Autowired
   private UsuarioServico usuarioServico;
+  @Autowired
+  private UsuarioRepositorio usuarioRepositorio;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+  @Autowired
+  private TokenServico tokenServico;
+
+  @PostMapping("login")
+  public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) {
+
+    UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(body.email())
+        .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+    if (passwordEncoder.matches(body.password(), usuario.getSenha())) {
+      String token = this.tokenServico.geradorToken(usuario);
+      return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token));
+    }
+    return ResponseEntity.badRequest().build();
+  }
+
 
   @DeleteMapping("remover/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
