@@ -30,8 +30,8 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
-            authorize -> authorize.requestMatchers(HttpMethod.POST, "/usuario/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/usuario/cadastrar").permitAll().anyRequest()
+            authorize -> authorize.requestMatchers(HttpMethod.POST,"/usuario/login").permitAll()
+                .requestMatchers(HttpMethod.POST,"/usuario/cadastrar").permitAll().anyRequest()
                 .authenticated())
         .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class);
     return http.build();

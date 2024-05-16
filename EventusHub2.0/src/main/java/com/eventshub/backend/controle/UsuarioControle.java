@@ -36,45 +36,31 @@ public class UsuarioControle {
 
   @Autowired
   private UsuarioServico usuarioServico;
-  @Autowired
-  private UsuarioRepositorio usuarioRepositorio;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-  @Autowired
-  private TokenServico tokenServico;
-
-  @PostMapping("login")
-  public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) {
-
-    UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(body.email())
-        .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
-    if (passwordEncoder.matches(body.password(), usuario.getSenha())) {
-      String token = this.tokenServico.geradorToken(usuario);
-      return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token));
-    }
-    return ResponseEntity.badRequest().build();
+  @PostMapping("/login")
+  public ResponseEntity<?> login(@RequestBody UsuarioModelo usuarioModelo) {
+    return usuarioServico.login(usuarioModelo);
   }
 
 
-  @DeleteMapping("remover/{id}")
+  @DeleteMapping("/remover/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
     return usuarioServico.remover(id);
   }
 
-  @PutMapping("alterar/{id}")
+  @PutMapping("/alterar/{id}")
   public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo,
       @PathVariable Long id) {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar", id);
   }
 
 
-  @PostMapping("cadastrar")
+  @PostMapping("/cadastrar")
   public ResponseEntity<?> cadastar(@RequestBody @Valid UsuarioModelo usuarioModelo) {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "cadastrar", null);
   }
 
-  @GetMapping("listar")
+  @GetMapping("/listar")
   public Iterable<UsuarioModelo> listar() {
     return usuarioServico.listar();
   }

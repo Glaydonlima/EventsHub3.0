@@ -3,7 +3,6 @@ package com.eventshub.backend.servico.seguranca;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -16,7 +15,7 @@ public class TokenServico {
   public String geradorToken(UsuarioModelo usuario) {
     try {
       Algorithm algoritimo = Algorithm.HMAC256("segredo");
-      String token = JWT.create().withIssuer("login-auth-api").withSubject(usuario.getEmail())
+      String token = JWT.create().withIssuer("EventusHub2.0").withSubject(usuario.getEmail())
           .withExpiresAt(this.expiradorJWT()).sign(algoritimo);
       return token;
     } catch (JWTCreationException exception) {
@@ -28,7 +27,7 @@ public class TokenServico {
   public String validarToken(String token) {
     try {
       Algorithm algoritimo = Algorithm.HMAC256("segredo");
-      return JWT.require(algoritimo).withIssuer("login-auth-api").build().verify(token)
+      return JWT.require(algoritimo).withIssuer("EventusHub2.0").build().verify(token)
           .getSubject();
     } catch (JWTVerificationException exception) {
       return null;
