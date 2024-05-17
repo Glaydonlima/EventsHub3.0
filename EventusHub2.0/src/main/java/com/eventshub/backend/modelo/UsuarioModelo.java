@@ -11,8 +11,8 @@ import lombok.Data;
 @Entity
 @Table(name = "usuarios")
 @Data
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name="TIPO")
+@DiscriminatorColumn(name = "TIPO_USUARIO")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class UsuarioModelo {
 
     @Id

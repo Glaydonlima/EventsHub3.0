@@ -38,4 +38,7 @@ public class ServicoModelo {
     @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
     private List<PagamentoModelo> pagamentos;
 
+    @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
+    private List<FotoModelo> fotos;
+
 }

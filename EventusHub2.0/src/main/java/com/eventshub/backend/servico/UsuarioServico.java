@@ -4,11 +4,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.eventshub.backend.dto.ResponseDTO;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
 
 @Service
 public class UsuarioServico {
@@ -19,45 +22,33 @@ public class UsuarioServico {
   @Autowired
   private RespostaModelo respostaModelo;
 
-  /*
-   * public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
-   * if (acao.equals("cadastrar")) { if (usuarioModelo.getNome() == null ||
-   * usuarioModelo.getNome().isEmpty()) {
-   * respostaModelo.setMensagem("O nome do produto é obrigatório!"); return new
-   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } else if
-   * (usuarioModelo.getEmail() == null || usuarioModelo.getEmail().isEmpty()) {
-   * respostaModelo.setMensagem("O Email é obrigatório!"); return new
-   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } else if
-   * (usuarioModelo.getSenha() == null || usuarioModelo.getSenha().isEmpty()) {
-   * respostaModelo.setMensagem("A senha é obrigatória!"); return new
-   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } if
-   * (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
-   * respostaModelo.setMensagem("O email já está cadastrado!"); return new
-   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } String senha =
-   * usuarioModelo.getSenha(); usuarioModelo.setSenha(CriptoServico.criptografar(senha)); return new
-   * ResponseEntity<UsuarioModelo>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED); }
-   * else if (acao.equals("alterar")) { Optional<UsuarioModelo> usuarioExistente =
-   * usuarioRepositorio.findById(id); if (usuarioExistente.isPresent()) { UsuarioModelo
-   * usuarioExistenteAtualizado = usuarioExistente.get(); if (usuarioModelo.getNome() != null &&
-   * !usuarioModelo.getNome().isEmpty()) {
-   * usuarioExistenteAtualizado.setNome(usuarioModelo.getNome()); } if (usuarioModelo.getEmail() !=
-   * null && !usuarioModelo.getEmail().isEmpty()) {
-   * usuarioExistenteAtualizado.setEmail(usuarioModelo.getEmail()); } if (usuarioModelo.getSenha()
-   * != null && !usuarioModelo.getSenha().isEmpty()) { String senha = usuarioModelo.getSenha();
-   * usuarioExistenteAtualizado.setSenha(CriptoServico.criptografar(senha)); } if
-   * (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
-   * respostaModelo.setMensagem("O email já está cadastrado!"); return new
-   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } return new
-   * ResponseEntity<UsuarioModelo>( usuarioRepositorio.save(usuarioExistenteAtualizado),
-   * HttpStatus.OK); } else { return new ResponseEntity<RespostaModelo>(respostaModelo,
-   * HttpStatus.NOT_FOUND); } } else { respostaModelo.setMensagem("Ação inválida!"); return new
-   * ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST); } }
-   */
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private TokenServico tokenServico;
+
+
+  public ResponseEntity<?> login(UsuarioModelo usuarioModelo){
+    UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(usuarioModelo.getEmail())
+        .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+    if (passwordEncoder.matches(usuarioModelo.getSenha(), usuario.getSenha())) {
+      String token = this.tokenServico.geradorToken(usuario);
+      return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token));
+    }
+    return ResponseEntity.badRequest().build();
+  }
 
   public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
     if (acao.equals("cadastrar")) {
-      usuarioModelo.setSenha(CriptoServico.criptografar(usuarioModelo.getSenha()));
-      return new ResponseEntity<>(usuarioRepositorio.save(usuarioModelo), HttpStatus.CREATED);
+      Optional<UsuarioModelo> usuario = usuarioRepositorio.findByEmail(usuarioModelo.getEmail());
+        if(usuario.isEmpty()) {
+          usuarioModelo.setSenha(passwordEncoder.encode(usuarioModelo.getSenha()));
+            String token = tokenServico.geradorToken(usuarioModelo);
+            usuarioRepositorio.save(usuarioModelo);
+            return new ResponseEntity<>(new ResponseDTO(usuarioModelo.getNome(), token), HttpStatus.CREATED);
+        }
+        return ResponseEntity.badRequest().build();
     } else if (acao.equals("alterar")) {
       Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(id);
       if (usuarioExistente.isPresent()) {
