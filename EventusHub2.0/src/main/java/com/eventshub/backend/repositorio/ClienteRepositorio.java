@@ -9,3 +9,5 @@ import com.eventshub.backend.modelo.ClienteModelo;
 public interface ClienteRepositorio extends CrudRepository<ClienteModelo, Long> {
 
 }
+
+

@@ -10,6 +10,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+//import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
 import java.io.IOException;
@@ -25,8 +27,8 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   UsuarioRepositorio usuarioRepositorio;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest request, @SuppressWarnings("null") HttpServletResponse response,
+     @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException {
     var token = this.recuperarToken(request);
     var login = tokenServico.validarToken(token);
 
@@ -46,4 +48,6 @@ public class SegurancaFiltro extends OncePerRequestFilter {
       return null;
     return authHeader.replace("Bearer ", "");
   }
+
+  
 }
