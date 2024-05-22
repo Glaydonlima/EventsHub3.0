@@ -11,4 +11,7 @@ public interface UsuarioRepositorio extends CrudRepository<UsuarioModelo, Long> 
   boolean existsByEmail(String email);
 
   Optional<UsuarioModelo> findByEmail(String email);
+
+;
+
 }

@@ -5,20 +5,15 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
-import com.eventshub.backend.dto.LoginRequestDTO;
-import com.eventshub.backend.dto.ResponseDTO;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
-import com.eventshub.backend.repositorio.UsuarioRepositorio;
 import com.eventshub.backend.servico.UsuarioServico;
-import com.eventshub.backend.servico.seguranca.TokenServico;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +32,7 @@ public class UsuarioControle {
   @Autowired
   private UsuarioServico usuarioServico;
 
+
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody UsuarioModelo usuarioModelo) {
     return usuarioServico.login(usuarioModelo);
@@ -53,6 +49,7 @@ public class UsuarioControle {
       @PathVariable Long id) {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar", id);
   }
+
 
 
   @PostMapping("/cadastrar")
