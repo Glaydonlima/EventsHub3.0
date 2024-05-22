@@ -15,7 +15,7 @@ public class TokenServico {
   public String geradorToken(UsuarioModelo usuario) {
     try {
       Algorithm algoritimo = Algorithm.HMAC256("segredo");
-      String token = JWT.create().withIssuer("EventusHub2.0").withSubject(usuario.getEmail())
+      String token = JWT.create().withIssuer("EventsHub2.0").withSubject(usuario.getEmail())
           .withExpiresAt(this.expiradorJWT()).sign(algoritimo);
       return token;
     } catch (JWTCreationException exception) {
@@ -27,7 +27,7 @@ public class TokenServico {
   public String validarToken(String token) {
     try {
       Algorithm algoritimo = Algorithm.HMAC256("segredo");
-      return JWT.require(algoritimo).withIssuer("EventusHub2.0").build().verify(token)
+      return JWT.require(algoritimo).withIssuer("EventsHub2.0").build().verify(token)
           .getSubject();
     } catch (JWTVerificationException exception) {
       return null;

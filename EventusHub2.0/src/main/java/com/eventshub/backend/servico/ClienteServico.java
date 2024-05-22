@@ -61,5 +61,10 @@ public class ClienteServico {
     return clienteRepositorio.findAll();
   }
 
+public Object listaAutenticado(Long id) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'listaAutenticado'");
+}
+
 
 }
