@@ -61,7 +61,7 @@ public class UsuarioServico {
         }
         if (usuarioModelo.getSenha() != null && !usuarioModelo.getSenha().isEmpty()) {
           String senha = usuarioModelo.getSenha();
-          usuarioExistenteAtualizado.setSenha(CriptoServico.criptografar(senha));
+          usuarioExistenteAtualizado.setSenha(passwordEncoder.encode(senha));
         }
         if (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
           respostaModelo.setMensagem("O email já está cadastrado!");

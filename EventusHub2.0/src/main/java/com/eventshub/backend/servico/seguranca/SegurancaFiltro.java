@@ -34,10 +34,21 @@ public class SegurancaFiltro extends OncePerRequestFilter {
 
     if (login != null) {
       UsuarioModelo usuario = usuarioRepositorio.findByEmail(login)
-          .orElseThrow(() -> new RuntimeException("Usuario não encontrado?"));
+          .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
       var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
       var authentication = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
       SecurityContextHolder.getContext().setAuthentication(authentication);
+
+      String method = request.getMethod();
+        if ("PUT".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method)) {
+            String userIdPath = getUserIdFromPath(request.getRequestURI());
+            if (userIdPath != null && !userIdPath.equals(usuario.getId().toString())) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("Você não tem permissão para modificar estas informações.");
+                return;
+            }
+        }
+
     }
     filterChain.doFilter(request, response);
   }
@@ -48,6 +59,11 @@ public class SegurancaFiltro extends OncePerRequestFilter {
       return null;
     return authHeader.replace("Bearer ", "");
   }
+
+  private String getUserIdFromPath(String uri) {
+    String[] parts = uri.split("/");
+    return parts.length > 2 ? parts[parts.length - 1] : null;
+}
 
   
 }
