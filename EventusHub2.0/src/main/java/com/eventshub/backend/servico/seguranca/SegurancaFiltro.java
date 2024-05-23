@@ -76,12 +76,12 @@ public class SegurancaFiltro extends OncePerRequestFilter {
     String path = request.getRequestURI();
     String method = request.getMethod();
     
-    for (RotasModelo rota : rotasModeloConfig()) {
-        if (rota.getRota() != null && rota.getMetodo() != null
-                && antPathMatcher.match(rota.getRota(), path) && rota.getMetodo().name().equals(method)) {
-            return authorities.contains(new SimpleGrantedAuthority(rota.getAutorizacao()));
-        }
-    }
+    // for (RotasModelo rota : rotasModeloConfig()) {
+    //     if (rota.getRota() != null && rota.getMetodo() != null
+    //             && antPathMatcher.match(rota.getRota(), path) && rota.getMetodo().name().equals(method)) {
+    //         return authorities.contains(new SimpleGrantedAuthority(rota.getAutorizacao()));
+    //     }
+    // }
     
     return true; 
 }
