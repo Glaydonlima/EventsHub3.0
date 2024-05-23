@@ -2,6 +2,7 @@ package com.eventshub.backend.modelo;
 
 import org.springframework.data.annotation.CreatedDate;
 import java.util.Date;
+import java.util.Set;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +12,6 @@ import lombok.Data;
 @Entity
 @Table(name = "usuarios")
 @Data
-@DiscriminatorColumn(name = "TIPO_USUARIO")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class UsuarioModelo {
 
@@ -39,5 +39,14 @@ public class UsuarioModelo {
     public UsuarioModelo() {
         this.dataCriacao = new Date();
     }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"))
+    @Column(name = "role")
+    private Set<String> roles;
+    
+    public boolean hasRole(String role) {
+      return getRoles().contains(role);
+  }
 
 }

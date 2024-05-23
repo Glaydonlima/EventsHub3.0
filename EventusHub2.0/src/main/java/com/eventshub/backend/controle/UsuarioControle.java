@@ -38,19 +38,17 @@ public class UsuarioControle {
     return usuarioServico.login(usuarioModelo);
   }
 
-
   @DeleteMapping("/remover/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
     return usuarioServico.remover(id);
   }
+
 
   @PutMapping("/alterar/{id}")
   public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo,
       @PathVariable Long id) {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar", id);
   }
-
-
 
   @PostMapping("/cadastrar")
   public ResponseEntity<?> cadastar(@RequestBody @Valid UsuarioModelo usuarioModelo) {

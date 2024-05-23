@@ -1,6 +1,8 @@
 package com.eventshub.backend.servico;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,7 @@ public class UsuarioServico {
   private TokenServico tokenServico;
 
 
-  public ResponseEntity<?> login(UsuarioModelo usuarioModelo){
+  public ResponseEntity<?> login(UsuarioModelo usuarioModelo) {
     UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(usuarioModelo.getEmail())
         .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
     if (passwordEncoder.matches(usuarioModelo.getSenha(), usuario.getSenha())) {
@@ -42,13 +44,17 @@ public class UsuarioServico {
   public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
     if (acao.equals("cadastrar")) {
       Optional<UsuarioModelo> usuario = usuarioRepositorio.findByEmail(usuarioModelo.getEmail());
-        if(usuario.isEmpty()) {
-          usuarioModelo.setSenha(passwordEncoder.encode(usuarioModelo.getSenha()));
-            String token = tokenServico.geradorToken(usuarioModelo);
-            usuarioRepositorio.save(usuarioModelo);
-            return new ResponseEntity<>(new ResponseDTO(usuarioModelo.getNome(), token), HttpStatus.CREATED);
-        }
-        return ResponseEntity.badRequest().build();
+      if (usuario.isEmpty()) {
+        usuarioModelo.setSenha(passwordEncoder.encode(usuarioModelo.getSenha()));
+        Set<String> roles = new HashSet<>();
+        roles.add("ROLE_USER");
+        usuarioModelo.setRoles(roles);
+        String token = tokenServico.geradorToken(usuarioModelo);
+        usuarioRepositorio.save(usuarioModelo);
+        return new ResponseEntity<>(new ResponseDTO(usuarioModelo.getNome(), token),
+            HttpStatus.CREATED);
+      }
+      return ResponseEntity.badRequest().build();
     } else if (acao.equals("alterar")) {
       Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(id);
       if (usuarioExistente.isPresent()) {
@@ -93,4 +99,5 @@ public class UsuarioServico {
     return usuarioRepositorio.findAll();
   }
 
+  
 }

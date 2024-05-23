@@ -19,6 +19,11 @@ public class ServicoServico {
   @Autowired
   private FotoRepositorio fotoRepositorio;
 
+
+  public Iterable<ServicoModelo> listarServicos() {
+    return servicoRepositorio.findAll();
+  }
+
   public ServicoModelo salvarServico(ServicoModelo servico) {
     return servicoRepositorio.save(servico);
   }

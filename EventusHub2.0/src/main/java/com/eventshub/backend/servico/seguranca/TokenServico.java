@@ -12,6 +12,7 @@ import com.eventshub.backend.modelo.UsuarioModelo;
 
 @Service
 public class TokenServico {
+  
   public String geradorToken(UsuarioModelo usuario) {
     try {
       Algorithm algoritimo = Algorithm.HMAC256("segredo");

@@ -20,6 +20,21 @@ public class ServicoControle {
     return servicoServico.salvarServico(servico);
   }
 
+  @GetMapping
+public Iterable<ServicoModelo> listarServicos() {
+    Iterable<ServicoModelo> servicos = servicoServico.listarServicos();
+    for (ServicoModelo servico : servicos) {
+        servico.setFotos(servicoServico.obterFotosPorServico(servico.getId()));
+    }
+    return servicos;
+}
+  @GetMapping("/{servicoId}")
+public ServicoModelo obterServicoPorId(@PathVariable Long servicoId) {
+    ServicoModelo servico = servicoServico.obterServicoPorId(servicoId);
+    servico.setFotos(servicoServico.obterFotosPorServico(servicoId));
+    return servico;
+}
+
   @PostMapping("/{servicoId}/fotos")
   public FotoModelo adicionarFoto(@PathVariable Long servicoId, @RequestBody FotoModelo foto) {
     ServicoModelo servico = servicoServico.obterServicoPorId(servicoId);
