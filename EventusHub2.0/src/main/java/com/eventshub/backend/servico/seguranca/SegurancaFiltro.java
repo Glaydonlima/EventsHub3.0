@@ -44,7 +44,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-  @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException {
+      @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException {
     var token = recuperarToken(request);
     if (token != null) {
       var login = tokenServico.validarToken(token);
@@ -52,12 +52,11 @@ public class SegurancaFiltro extends OncePerRequestFilter {
         Optional<UsuarioModelo> usuarioOpt = usuarioRepositorio.findByEmail(login);
         if (usuarioOpt.isPresent()) {
           UsuarioModelo usuario = usuarioOpt.get();
-          var authorities  = usuario.getRoles().stream()
-                                   .map(role -> new SimpleGrantedAuthority(role))
-                                   .collect(Collectors.toList());
-          var authentication = new UsernamePasswordAuthenticationToken(usuario,null, authorities);
+          var authorities = usuario.getRoles().stream()
+              .map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+          var authentication = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
           SecurityContextHolder.getContext().setAuthentication(authentication);
-          
+
           if (!temPermissao(request, authorities)) {
             enviarRespostaErro(response, "Acesso negado.");
             return;
@@ -72,19 +71,20 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   }
 
 
-  private boolean temPermissao(HttpServletRequest request, List<SimpleGrantedAuthority> authorities) {
+  private boolean temPermissao(HttpServletRequest request,
+      List<SimpleGrantedAuthority> authorities) {
     String path = request.getRequestURI();
     String method = request.getMethod();
-    
-    // for (RotasModelo rota : rotasModeloConfig()) {
-    //     if (rota.getRota() != null && rota.getMetodo() != null
-    //             && antPathMatcher.match(rota.getRota(), path) && rota.getMetodo().name().equals(method)) {
-    //         return authorities.contains(new SimpleGrantedAuthority(rota.getAutorizacao()));
-    //     }
-    // }
-    
-    return true; 
-}
+
+    for (RotasModelo rota : rotasModeloConfig()) {
+      if (rota.getRota() != null && rota.getMetodo() != null
+          && antPathMatcher.match(rota.getRota(), path) && rota.getMetodo().name().equals(method)) {
+        return authorities.contains(new SimpleGrantedAuthority(rota.getAutorizacao()));
+      }
+    }
+
+    return true;
+  }
 
 
 
@@ -106,19 +106,19 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   }
 
   @Bean
-    public List<RotasModelo> rotasModeloConfig() {
-        List<RotasModelo> rotas = new ArrayList<>();
-        rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
-        rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
-        rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ADMIN"));
-        
-        rotas.add(new RotasModelo("/prestador/cadastrar/{id}", HttpMethod.POST, "ROLE_USER"));
-        rotas.add(new RotasModelo("/prestador/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
-        rotas.add(new RotasModelo("/prestador/remover/{id}", HttpMethod.DELETE, "ADMIN"));
-        rotas.add(new RotasModelo("/prestador/{id}", HttpMethod.GET, "ROLE_USER"));
-        rotas.add(new RotasModelo("/prestador/listar", HttpMethod.GET, "ADMIN"));
-        
-        return rotas;
-    }
+  public List<RotasModelo> rotasModeloConfig() {
+    List<RotasModelo> rotas = new ArrayList<>();
+    rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
+    rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
+    rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ADMIN"));
+
+    rotas.add(new RotasModelo("/prestador/cadastrar/{id}", HttpMethod.POST, "ROLE_USER"));
+    rotas.add(new RotasModelo("/prestador/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
+    rotas.add(new RotasModelo("/prestador/remover/{id}", HttpMethod.DELETE, "ADMIN"));
+    rotas.add(new RotasModelo("/prestador/{id}", HttpMethod.GET, "ROLE_USER"));
+    rotas.add(new RotasModelo("/prestador/listar", HttpMethod.GET, "ADMIN"));
+
+    return rotas;
+  }
 
 }

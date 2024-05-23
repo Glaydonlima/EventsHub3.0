@@ -22,7 +22,6 @@ public class ServicoServico {
 
   public Iterable<ServicoModelo> listarServicos() {
     return servicoRepositorio.findAll();
-
   }
 
   public ServicoModelo salvarServico(ServicoModelo servico) {

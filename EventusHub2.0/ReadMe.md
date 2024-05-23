@@ -4,9 +4,8 @@
 - Title: OpenAPI definition
 - Version: v0
 
-## Servers
+## Server
 - URL: http://localhost:8080
-- Description: Generated server url
 
 ## Endpoints
 
@@ -22,7 +21,11 @@
 
 #### Request Body
 - Content Type: application/json
-- Schema: [PLACEHOLDER_FOR_USUARIO_SCHEMA]
+- Schema:{
+  "nome": "string",
+  "email": "string",
+  "senha": "string"
+}
 - Required: true
 
 #### Responses

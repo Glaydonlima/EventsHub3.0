@@ -33,28 +33,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> {
-                rotasModeloConfig.forEach(rota -> {
-                    if (rota.getMetodo() != null && rota.getRota() != null
-                            && !rota.getRota().isEmpty()) {
-                        auth.requestMatchers(rota.getMetodo(), rota.getRota())
-                                .hasRole(rota.getAutorizacao());
-                    }
-                });
-                auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
-                      .permitAll();
-                auth.anyRequest().authenticated();
-            })
-          .exceptionHandling(exception -> exception
-              .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-            )
-          .formLogin(form -> form
-              .loginPage("/login")
-              .permitAll()
-            )
-          .logout(logout -> logout.permitAll())
-          .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class);
+        http.csrf(csrf -> csrf.disable())
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> {
+                    rotasModeloConfig.forEach(rota -> {
+                        if (rota.getMetodo() != null && rota.getRota() != null
+                                && !rota.getRota().isEmpty()) {
+                            auth.requestMatchers(rota.getMetodo(), rota.getRota())
+                                    .hasRole(rota.getAutorizacao());
+                        }
+                    });
+                    auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
+                            .permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .formLogin(form -> form.loginPage("/login").permitAll())
+                .logout(logout -> logout.permitAll())
+                .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -70,6 +68,6 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    
+
 
 }

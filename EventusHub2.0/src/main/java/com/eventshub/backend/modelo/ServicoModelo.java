@@ -27,6 +27,7 @@ public class ServicoModelo {
     private String titulo;
     private String descricao;
     private double preco;
+    private Boolean estaAtivo = true;
 
     @ManyToOne
     @JoinColumn(name = "prestador_id")
