@@ -77,7 +77,6 @@ public class SecurityConfig {
         rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
         rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
         rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ROLE_USER"));
-        System.out.println(rotas);
         return rotas;
     }
 

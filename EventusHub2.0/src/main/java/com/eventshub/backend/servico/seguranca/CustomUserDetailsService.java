@@ -1,6 +1,6 @@
 package com.eventshub.backend.servico.seguranca;
 
-
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,6 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UsuarioRepositorio repositorio;
 
+  
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UsuarioModelo usuario = this.repositorio.findByEmail(username)

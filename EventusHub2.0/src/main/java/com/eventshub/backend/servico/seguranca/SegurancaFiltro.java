@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,31 +33,29 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
   @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException {
     var token = recuperarToken(request);
-    System.out.println(token);
     if (token != null) {
       var login = tokenServico.validarToken(token);
       if (login != null) {
         Optional<UsuarioModelo> usuarioOpt = usuarioRepositorio.findByEmail(login);
         if (usuarioOpt.isPresent()) {
           UsuarioModelo usuario = usuarioOpt.get();
-          if (!usuario.hasRole("ADMIN") || usuario.hasRole("ROLE_USER")) {
-            enviarRespostaErro(response, "Você não tem permissão para acessar este recurso.");
-            return;
-          }
+          System.out.println(usuario+"dointernal");
+          var authorities  = usuario.getRoles();
+          var authentication = new UsernamePasswordAuthenticationToken(usuario, authorities);
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+          
         } else {
           enviarRespostaErro(response, "Usuário não encontrado.");
           return;
         }
       }
     }
-
     filterChain.doFilter(request, response);
   }
 
 
   private Set<String> temPermissao(HttpServletRequest request) {
     String token = recuperarToken(request);
-    System.out.println("Token recebido: " + token);
 
     if (token != null) {
       UsuarioModelo usuario = buscarUsuarioPorToken(token);
@@ -69,7 +69,6 @@ public class SegurancaFiltro extends OncePerRequestFilter {
 
 
   private UsuarioModelo buscarUsuarioPorToken(String token) {
-    System.out.println(token);
     String login = tokenServico.validarToken(token);
     if (login != null) {
       return usuarioRepositorio.findByEmail(login).orElse(null);
@@ -78,7 +77,6 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   }
 
   private String recuperarToken(HttpServletRequest request) {
-    System.out.println(request);
     var authHeader = request.getHeader("Authorization");
     if (authHeader == null)
       return null;
