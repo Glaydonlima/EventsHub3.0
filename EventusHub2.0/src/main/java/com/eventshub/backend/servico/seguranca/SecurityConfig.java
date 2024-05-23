@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,29 +34,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> {
-            rotasModeloConfig.forEach(rota -> {
-                if (rota.getMetodo() != null && rota.getRota() != null
-                        && !rota.getRota().isEmpty()) {
-                            System.out.println(rota.getMetodo());
-                    auth.requestMatchers(rota.getMetodo(), rota.getRota())
-                            .hasRole(rota.getAutorizacao());
-                }
-            });
-            auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
-                  .permitAll();
-            auth.requestMatchers(HttpMethod.POST, "/usuario/admin/**").hasRole("ADMIN");
-            auth.anyRequest().authenticated();
-        })
-      .exceptionHandling(exception -> exception
-          .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-        )
-      .formLogin(form -> form
-          .loginPage("/login")
-          .permitAll() 
-        )
-                .logout(logout -> logout.permitAll())
-                  .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class);
+        http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> {
+                rotasModeloConfig.forEach(rota -> {
+                    if (rota.getMetodo() != null && rota.getRota() != null
+                            && !rota.getRota().isEmpty()) {
+                        auth.requestMatchers(rota.getMetodo(), rota.getRota())
+                                .hasRole(rota.getAutorizacao());
+                    }
+                });
+                auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
+                      .permitAll();
+                auth.anyRequest().authenticated();
+            })
+          .exceptionHandling(exception -> exception
+              .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+            )
+          .formLogin(form -> form
+              .loginPage("/login")
+              .permitAll()
+            )
+          .logout(logout -> logout.permitAll())
+          .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -69,15 +69,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public List<RotasModelo> rotasModeloConfig() {
-        List<RotasModelo> rotas = new ArrayList<>();
-        rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
-        rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
-        rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ROLE_USER"));
-        return rotas;
     }
 
     
