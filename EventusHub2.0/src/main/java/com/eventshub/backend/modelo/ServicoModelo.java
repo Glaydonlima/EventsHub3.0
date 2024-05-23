@@ -40,5 +40,4 @@ public class ServicoModelo {
 
     @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
     private List<FotoModelo> fotos;
-
 }

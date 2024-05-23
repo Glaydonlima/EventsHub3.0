@@ -1,4 +1,4 @@
-package com.eventshub.backend.controle;
+/*package com.eventshub.backend.controle;
 
 import java.util.Optional;
 
@@ -60,3 +60,4 @@ public class AutenticadorControle {
     }
 
 }
+*/

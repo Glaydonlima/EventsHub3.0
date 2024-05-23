@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -38,25 +39,25 @@ public class UsuarioControle {
     return usuarioServico.login(usuarioModelo);
   }
 
-
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/remover/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
     return usuarioServico.remover(id);
   }
 
+  @PreAuthorize("hasRole('ROLE_USER')")
   @PutMapping("/alterar/{id}")
   public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo,
       @PathVariable Long id) {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "alterar", id);
   }
 
-
-
   @PostMapping("/cadastrar")
   public ResponseEntity<?> cadastar(@RequestBody @Valid UsuarioModelo usuarioModelo) {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "cadastrar", null);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/listar")
   public Iterable<UsuarioModelo> listar() {
     return usuarioServico.listar();
