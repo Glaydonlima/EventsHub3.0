@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.eventshub.backend.modelo.RotasModelo;
 
 @Configuration
@@ -30,19 +31,15 @@ public class SecurityConfig {
     @Autowired
     private List<RotasModelo> rotasModeloConfig;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("dale");
         http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> {
             rotasModeloConfig.forEach(rota -> {
-                System.out.println("dale");
                 if (rota.getMetodo() != null && rota.getRota() != null
                         && !rota.getRota().isEmpty()) {
                             System.out.println(rota.getMetodo());
                     auth.requestMatchers(rota.getMetodo(), rota.getRota())
                             .hasRole(rota.getAutorizacao());
-
                 }
             });
             auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
@@ -57,7 +54,8 @@ public class SecurityConfig {
           .loginPage("/login")
           .permitAll() 
         )
-                .logout(logout -> logout.permitAll());
+                .logout(logout -> logout.permitAll())
+                  .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -77,9 +75,12 @@ public class SecurityConfig {
     public List<RotasModelo> rotasModeloConfig() {
         List<RotasModelo> rotas = new ArrayList<>();
         rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
-        rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "USER"));
-        rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ADMIN"));
+        rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
+        rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ROLE_USER"));
+        System.out.println(rotas);
         return rotas;
     }
+
+    
 
 }

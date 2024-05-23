@@ -29,15 +29,16 @@ public class SegurancaFiltro extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
-    String token = recuperarToken(request);
+  @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException {
+    var token = recuperarToken(request);
+    System.out.println(token);
     if (token != null) {
-      String login = tokenServico.validarToken(token);
+      var login = tokenServico.validarToken(token);
       if (login != null) {
         Optional<UsuarioModelo> usuarioOpt = usuarioRepositorio.findByEmail(login);
         if (usuarioOpt.isPresent()) {
           UsuarioModelo usuario = usuarioOpt.get();
-          if (!usuario.hasRole("ADMIN") && !usuario.hasRole("ROLE_USER")) {
+          if (!usuario.hasRole("ADMIN") || usuario.hasRole("ROLE_USER")) {
             enviarRespostaErro(response, "Você não tem permissão para acessar este recurso.");
             return;
           }
@@ -47,6 +48,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
         }
       }
     }
+
     filterChain.doFilter(request, response);
   }
 
@@ -67,6 +69,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
 
 
   private UsuarioModelo buscarUsuarioPorToken(String token) {
+    System.out.println(token);
     String login = tokenServico.validarToken(token);
     if (login != null) {
       return usuarioRepositorio.findByEmail(login).orElse(null);
@@ -74,13 +77,12 @@ public class SegurancaFiltro extends OncePerRequestFilter {
     return null;
   }
 
-
   private String recuperarToken(HttpServletRequest request) {
-    String authHeader = request.getHeader("Authorization");
-    System.out.println(request.getHeader(authHeader));
-    return (authHeader != null && authHeader.startsWith("Bearer "))
-        ? authHeader.replace("Bearer ", "")
-        : null;
+    System.out.println(request);
+    var authHeader = request.getHeader("Authorization");
+    if (authHeader == null)
+      return null;
+    return authHeader.replace("Bearer ", "");
   }
 
   private void enviarRespostaErro(HttpServletResponse response, String mensagem)

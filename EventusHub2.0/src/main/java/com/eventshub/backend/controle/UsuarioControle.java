@@ -39,13 +39,12 @@ public class UsuarioControle {
     return usuarioServico.login(usuarioModelo);
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/remover/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
     return usuarioServico.remover(id);
   }
 
-  @PreAuthorize("hasRole('ROLE_USER')")
+
   @PutMapping("/alterar/{id}")
   public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo,
       @PathVariable Long id) {
@@ -57,7 +56,6 @@ public class UsuarioControle {
     return usuarioServico.cadastrarAlterar(usuarioModelo, "cadastrar", null);
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/listar")
   public Iterable<UsuarioModelo> listar() {
     return usuarioServico.listar();
