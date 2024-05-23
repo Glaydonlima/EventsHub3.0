@@ -28,7 +28,7 @@ public class ClienteServico {
     if (acao.equals("cadastrar")) {
         UsuarioModelo usuario = usuarioRepositorio.findById(id)
           .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-      clienteModelo.setId(usuario.getId());
+      clienteModelo.setUsuario(usuario);
       return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
     } else if (acao.equals("alterar")) {
       Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(id);
@@ -61,10 +61,6 @@ public class ClienteServico {
     return clienteRepositorio.findAll();
   }
 
-public Object listaAutenticado(Long id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'listaAutenticado'");
-}
 
 
 }

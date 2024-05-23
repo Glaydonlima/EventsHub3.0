@@ -83,7 +83,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
         }
     }
     
-    return false; 
+    return true; 
 }
 
 
@@ -111,6 +111,13 @@ public class SegurancaFiltro extends OncePerRequestFilter {
         rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
         rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
         rotas.add(new RotasModelo("/usuario/listar", HttpMethod.GET, "ADMIN"));
+        
+        rotas.add(new RotasModelo("/prestador/cadastrar/{id}", HttpMethod.POST, "ROLE_USER"));
+        rotas.add(new RotasModelo("/prestador/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));
+        rotas.add(new RotasModelo("/prestador/remover/{id}", HttpMethod.DELETE, "ADMIN"));
+        rotas.add(new RotasModelo("/prestador/{id}", HttpMethod.GET, "ROLE_USER"));
+        rotas.add(new RotasModelo("/prestador/listar", HttpMethod.GET, "ADMIN"));
+        
         return rotas;
     }
 
