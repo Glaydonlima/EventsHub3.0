@@ -3,15 +3,24 @@ package com.eventshub.backend.servico.seguranca;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.eventshub.backend.modelo.UsuarioModelo;
+import com.eventshub.backend.repositorio.UsuarioRepositorio;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class TokenServico {
+
+  @Autowired
+  private UsuarioRepositorio usuarioRepositorio;
   
   public String geradorToken(UsuarioModelo usuario) {
     try {
@@ -38,4 +47,26 @@ public class TokenServico {
   private Instant expiradorJWT() {
     return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
   }
+
+  public Long extrairIdUsuarioDoToken(String token) {
+    var login = validarToken(token); 
+    if (login != null) {
+        Optional<UsuarioModelo> usuarioOpt = usuarioRepositorio.findByEmail(login);
+        if (usuarioOpt.isPresent()) {
+            return usuarioOpt.get().getId(); 
+        } else {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+    } else {
+        throw new RuntimeException("Token inválido");
+    }
+}
+
+ public String recuperarToken(HttpServletRequest request) {
+    var authHeader = request.getHeader("Authorization");
+    if (authHeader == null)
+      return null;
+    return authHeader.replace("Bearer ", "");
+  }
+
 }

@@ -10,6 +10,9 @@ import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.PrestadorRepositorio;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class PrestadorServico {
@@ -22,9 +25,14 @@ public class PrestadorServico {
   @Autowired
   private UsuarioRepositorio usuarioRepositorio;
 
+  @Autowired
+  private TokenServico tokenServico;
+  
 
   public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao,
-      Long idUsuario) {
+      HttpServletRequest request) {
+
+        Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
     if (prestadorModelo.getRazaoSocial() == null || prestadorModelo.getRazaoSocial().isEmpty()) {
       respostaModelo.setMensagem("A razão social é obrigatória!");
       return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
@@ -80,6 +88,8 @@ public class PrestadorServico {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
+
+
 
   
 

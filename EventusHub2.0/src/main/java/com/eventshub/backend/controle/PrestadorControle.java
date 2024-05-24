@@ -15,6 +15,8 @@ import com.eventshub.backend.modelo.PrestadorModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.servico.PrestadorServico;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -24,16 +26,16 @@ public class PrestadorControle {
   @Autowired
   private PrestadorServico prestadorServico;
 
-  @PostMapping("/cadastrar/{id}")
+  @PostMapping("/cadastrar")
   public ResponseEntity<?> cadastrar(@RequestBody PrestadorModelo prestadorModelo,
-      @PathVariable Long id) {
-    return prestadorServico.cadastrarAlterar(prestadorModelo, "cadastrar", id);
+  HttpServletRequest request) {
+    return prestadorServico.cadastrarAlterar(prestadorModelo, "cadastrar", request);
   }
 
-  @PutMapping("/alterar/{id}")
+  @PutMapping("/alterar")
   public ResponseEntity<?> alterar(@RequestBody PrestadorModelo prestadorModelo,
-      @PathVariable Long id) {
-    return prestadorServico.cadastrarAlterar(prestadorModelo, "alterar", id);
+      HttpServletRequest request) {
+    return prestadorServico.cadastrarAlterar(prestadorModelo, "alterar", request);
   }
 
   @DeleteMapping("/remover/{id}")

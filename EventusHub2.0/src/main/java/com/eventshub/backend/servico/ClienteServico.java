@@ -12,6 +12,9 @@ import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.ClienteRepositorio;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class ClienteServico {
@@ -24,14 +27,19 @@ public class ClienteServico {
   @Autowired
   private UsuarioRepositorio usuarioRepositorio;
 
-   public ResponseEntity<?> cadastrarAlterar(ClienteModelo clienteModelo, String acao, Long id) {
+  @Autowired
+  private TokenServico tokenServico;
+  
+
+   public ResponseEntity<?> cadastrarAlterar(ClienteModelo clienteModelo, String acao, HttpServletRequest request) {
+     Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
     if (acao.equals("cadastrar")) {
-        UsuarioModelo usuario = usuarioRepositorio.findById(id)
+        UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
           .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
       clienteModelo.setUsuario(usuario);
       return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
     } else if (acao.equals("alterar")) {
-      Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(id);
+      Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(idUsuario);
       if (clienteExistente.isPresent()) {
         ClienteModelo clienteExistenteAtualizado = clienteExistente.get();
         return new ResponseEntity<ClienteModelo>(

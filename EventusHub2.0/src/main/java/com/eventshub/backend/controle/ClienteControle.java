@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.servico.ClienteServico;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -24,14 +26,14 @@ public class ClienteControle {
     @Autowired
     private ClienteServico clienteServico;
 
-    @PostMapping("/cadastrar/{id}")
-    public ResponseEntity<?> cadastrarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long id) {
-        return clienteServico.cadastrarAlterar(clienteModelo, "cadastrar", id);
+    @PostMapping("/cadastrar")
+    public ResponseEntity<?> cadastrarCliente(@Valid @RequestBody ClienteModelo clienteModelo,HttpServletRequest request) {
+        return clienteServico.cadastrarAlterar(clienteModelo, "cadastrar", request);
     }
 
     @PutMapping("/alterar/{id}")
-    public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long id) {
-        return clienteServico.cadastrarAlterar(clienteModelo, "alterar", id);
+    public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, HttpServletRequest request) {
+        return clienteServico.cadastrarAlterar(clienteModelo, "alterar", request);
     }
 
     @DeleteMapping("/remover/{id}")
