@@ -1,5 +1,7 @@
 package com.eventshub.backend.modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,5 +24,6 @@ public class FotoModelo {
 
   @ManyToOne
   @JoinColumn(name = "servico_id")
+  @JsonIgnore
   private ServicoModelo servico;
 }

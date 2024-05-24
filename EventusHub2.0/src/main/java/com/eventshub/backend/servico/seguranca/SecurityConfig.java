@@ -46,6 +46,8 @@ public class SecurityConfig {
                     });
                     auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
                             .permitAll();
+                            auth.requestMatchers(HttpMethod.GET, "/servicos/listar")
+                        .permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(
