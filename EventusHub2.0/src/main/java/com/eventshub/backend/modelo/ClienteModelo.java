@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class ClienteModelo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "O endereço não pode estar em branco")

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.servico.ClienteServico;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -25,15 +27,15 @@ public class ClienteControle {
 
     private final ClienteServico clienteServico;
 
-    @PostMapping("/usuario/{usuarioId}")
-    public ResponseEntity<?> cadastrarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long usuarioId) {
-        return clienteServico.cadastrar(clienteModelo, usuarioId);
+    @PostMapping()
+    public ResponseEntity<?> cadastrarCliente(@Valid @RequestBody ClienteModelo clienteModelo, HttpServletRequest request) {
+        return clienteServico.cadastrar(clienteModelo, request);
     }
 
     @Secured({"ROLE_CLIENTE", "ADMIN"})
-    @PutMapping("/{clienteId}")
-    public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long clienteId) {
-        return clienteServico.alterar(clienteModelo, clienteId);
+    @PutMapping()
+    public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, HttpServletRequest request) {
+        return clienteServico.alterar(clienteModelo, request);
     }
 
     @Secured({"ROLE_CLIENTE", "ADMIN"})

@@ -2,7 +2,7 @@ package com.eventshub.backend.servico;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,27 +12,37 @@ import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.ClienteRepositorio;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+@RequiredArgsConstructor
 @Service
 public class ClienteServico {
-  @Autowired
-  private ClienteRepositorio clienteRepositorio;
+  
+  private final ClienteRepositorio clienteRepositorio;
 
-  @Autowired
-  private RespostaModelo respostaModelo;
+  
+  private final RespostaModelo respostaModelo;
 
-  @Autowired
-  private UsuarioRepositorio usuarioRepositorio;
+  
+  private final UsuarioRepositorio usuarioRepositorio;
 
-   public ResponseEntity<?> cadastrar(ClienteModelo clienteModelo, Long id) {
-        UsuarioModelo usuario = usuarioRepositorio.findById(id)
+  
+  private final TokenServico tokenServico;
+
+   public ResponseEntity<?> cadastrar(ClienteModelo clienteModelo,  HttpServletRequest request) {
+        Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+        UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
           .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
       clienteModelo.setUsuario(usuario);
+      clienteModelo.setId(usuario.getId());
       return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
    }
 
-   public ResponseEntity<?> alterar(ClienteModelo clienteModelo, Long id) {
-      Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(id);
+   public ResponseEntity<?> alterar(ClienteModelo clienteModelo, HttpServletRequest request) {
+      Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+      Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(idUsuario);
       if (clienteExistente.isPresent()) {
         ClienteModelo clienteExistenteAtualizado = clienteExistente.get();
         if (clienteModelo.getEndereco() != null && !clienteModelo.getEndereco().isEmpty()) {
