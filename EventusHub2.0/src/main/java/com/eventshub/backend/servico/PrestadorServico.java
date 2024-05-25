@@ -1,12 +1,11 @@
 package com.eventshub.backend.servico;
 
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.PrestadorModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
@@ -29,6 +28,7 @@ public class PrestadorServico {
   private final TokenServico tokenServico;
 
   public ResponseEntity<?> alterar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
+  try{
     Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
       Optional<PrestadorModelo> prestadorExistente = prestadorRepositorio.findById(idUsuario);
       if (!prestadorExistente.isPresent()) {
@@ -55,16 +55,23 @@ public class PrestadorServico {
 
     return new ResponseEntity<>(
         prestadorRepositorio.save(prestadorExistenteAtualizado), HttpStatus.OK);
-    }
+    } catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);}
+  }
   
   public ResponseEntity<?> cadastrar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
+  try{
     Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
     UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-    prestadorModelo.setUsuario(usuario);
-    prestadorModelo.setId(usuario.getId());
-    return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
-        HttpStatus.OK); 
+          Set<String> roles = usuario.getRoles();
+            roles.add("ROLE_PRESTADOR");
+            usuario.setRoles(roles);
+            usuarioRepositorio.save(usuario);
+      prestadorModelo.setUsuario(usuario);
+      prestadorModelo.setId(usuario.getId());
+      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
+        HttpStatus.OK);
+      }catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);}      
 }
 
 
