@@ -1,6 +1,5 @@
 package com.eventshub.backend.controle;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,28 +14,29 @@ import com.eventshub.backend.modelo.PrestadorModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.servico.PrestadorServico;
 
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/prestador")
+@RequestMapping("/v1/prestador")
 public class PrestadorControle {
 
-  @Autowired
-  private PrestadorServico prestadorServico;
+  private final PrestadorServico prestadorServico;
 
-  @PostMapping("/cadastrar/{id}")
+  @PostMapping("/{id}")
   public ResponseEntity<?> cadastrar(@RequestBody PrestadorModelo prestadorModelo,
-      @PathVariable Long id) {
-    return prestadorServico.cadastrarAlterar(prestadorModelo, "cadastrar", id);
+      @PathVariable Long idUsuario) {
+    return prestadorServico.cadastrar(prestadorModelo, idUsuario);
   }
 
-  @PutMapping("/alterar/{id}")
+  @PutMapping("/{id}")
   public ResponseEntity<?> alterar(@RequestBody PrestadorModelo prestadorModelo,
-      @PathVariable Long id) {
-    return prestadorServico.cadastrarAlterar(prestadorModelo, "alterar", id);
+      @PathVariable Long idUsuario) {
+    return prestadorServico.alterar(prestadorModelo, idUsuario);
   }
 
-  @DeleteMapping("/remover/{id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable Long id) {
     return prestadorServico.remover(id);
   }

@@ -30,19 +30,19 @@ public class ClienteControle {
         return clienteServico.cadastrar(clienteModelo, usuarioId);
     }
 
-    @Secured({"ROLE_ClIENTE", "ADMIN"})
+    @Secured({"ROLE_CLIENTE", "ADMIN"})
     @PutMapping("/{clienteId}")
     public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long clienteId) {
         return clienteServico.alterar(clienteModelo, clienteId);
     }
 
-    @Secured({"ROLE_ClIENTE", "ADMIN"})
+    @Secured({"ROLE_CLIENTE", "ADMIN"})
     @DeleteMapping("/{clienteId}")
     public ResponseEntity<RespostaModelo> removerCliente(@PathVariable Long clienteId) {
         return clienteServico.remover(clienteId);
     }
 
-    @Secured({"ROLE_ClIENTE", "ADMIN"})
+    @Secured({"ROLE_CLIENTE", "ADMIN"})
     @GetMapping()
     public Iterable<ClienteModelo> listarClientes() {
         return clienteServico.listar();

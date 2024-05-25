@@ -22,39 +22,39 @@ public class PrestadorServico {
   @Autowired
   private UsuarioRepositorio usuarioRepositorio;
 
+  private boolean isNullOrEmpty(String str) {
+    return str == null || str.isEmpty();
+  }
 
-  public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao, //alterar o nome dos métodos
-      Long idUsuario) {
-    if (prestadorModelo.getRazaoSocial() == null || prestadorModelo.getRazaoSocial().isEmpty()) {
-      respostaModelo.setMensagem("A razão social é obrigatória!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+  private ResponseEntity<RespostaModelo> createErrorResponse(String message) {
+    respostaModelo.setMensagem(message);
+    return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+  }
+
+  public ResponseEntity<?> alterar(PrestadorModelo prestadorModelo, Long idUsuario) {
+        if (isNullOrEmpty(prestadorModelo.getRazaoSocial())) {
+          return createErrorResponse("A razão social é obrigatória!");
     }
-    if (prestadorModelo.getCpf() == null || prestadorModelo.getCpf().isEmpty()) {
-      respostaModelo.setMensagem("O Cpf ou Cnpj é obrigatório!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    if (isNullOrEmpty(prestadorModelo.getCpf())) {
+      return createErrorResponse("O Cpf ou Cnpj é obrigatório!");
     }
-    if (prestadorModelo.getDescricaoEmpresa() == null
-        || prestadorModelo.getDescricaoEmpresa().isEmpty()) {
-      respostaModelo.setMensagem("A descrição da empresa é obrigatória!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    if (isNullOrEmpty(prestadorModelo.getDescricaoEmpresa())) {
+      return createErrorResponse("A descrição da empresa é obrigatória!");
     }
     if (prestadorRepositorio.existsByCpf(prestadorModelo.getCpf())) {
-      respostaModelo.setMensagem("O Cpf ou Cnpj já está em uso!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+      return createErrorResponse("O Cpf ou Cnpj já está em uso!");
     }
-    if (acao.equalsIgnoreCase("cadastrar")) {
-      UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
-          .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-      prestadorModelo.setUsuario(usuario);
-      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
-          HttpStatus.OK);
-    } else if (acao.equalsIgnoreCase("alterar")) {
-      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
-          HttpStatus.OK);
-    } else {
-      return ResponseEntity.badRequest().body("Ação inválida");
-    }
+      prestadorRepositorio.save(prestadorModelo);
+      return new ResponseEntity<>(prestadorModelo, HttpStatus.OK);
   }
+
+  public ResponseEntity<?> cadastrar(PrestadorModelo prestadorModelo, Long idUsuario) {
+    UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
+        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    prestadorModelo.setUsuario(usuario);
+    return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
+        HttpStatus.OK); 
+}
 
 
   public ResponseEntity<RespostaModelo> remover(long id) {
