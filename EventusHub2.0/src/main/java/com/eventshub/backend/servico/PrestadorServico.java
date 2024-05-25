@@ -75,16 +75,19 @@ public class PrestadorServico {
 }
 
 
-  public ResponseEntity<RespostaModelo> remover(long id) {
-    if (prestadorRepositorio.existsById(id)) {
-      prestadorRepositorio.deleteById(id);
+public ResponseEntity<RespostaModelo> remover(long id) {
+  long countBeforeDelete = prestadorRepositorio.count();
+  prestadorRepositorio.deleteById(id);
+  long countAfterDelete = prestadorRepositorio.count();
+
+  if (countBeforeDelete > countAfterDelete) {
       respostaModelo.setMensagem("O prestador foi removido com sucesso");
       return new ResponseEntity<>(respostaModelo, HttpStatus.OK);
-    } else {
+  } else {
       respostaModelo.setMensagem("Prestador não encontrado");
       return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
-    }
   }
+}
 
   public Iterable<PrestadorModelo> listar() {
     return prestadorRepositorio.findAll();
