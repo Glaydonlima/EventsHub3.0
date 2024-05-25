@@ -24,30 +24,33 @@ public class ClienteServico {
   @Autowired
   private UsuarioRepositorio usuarioRepositorio;
 
-   public ResponseEntity<?> cadastrarAlterar(ClienteModelo clienteModelo, String acao, Long id) {
-    if (acao.equals("cadastrar")) {
+   public ResponseEntity<?> cadastrar(ClienteModelo clienteModelo, Long id) {
         UsuarioModelo usuario = usuarioRepositorio.findById(id)
           .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
       clienteModelo.setUsuario(usuario);
       return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
-    } else if (acao.equals("alterar")) {
+   }
+
+   public ResponseEntity<?> alterar(ClienteModelo clienteModelo, Long id) {
       Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(id);
       if (clienteExistente.isPresent()) {
         ClienteModelo clienteExistenteAtualizado = clienteExistente.get();
+        if (clienteModelo.getEndereco() != null && !clienteModelo.getEndereco().isEmpty()) {
+          clienteExistenteAtualizado.setEndereco(clienteModelo.getEndereco());
+        }
+        if (clienteModelo.getTelefone() != null && !clienteModelo.getTelefone().isEmpty()) {
+          clienteExistenteAtualizado.setTelefone(clienteModelo.getTelefone());
+        }
         return new ResponseEntity<ClienteModelo>(
             clienteRepositorio.save(clienteExistenteAtualizado), HttpStatus.OK);
       } else {
         respostaModelo.setMensagem("Cliente não encontrado");
         return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.NOT_FOUND);
       }
-    } else {
-      respostaModelo.setMensagem("Ação inválida!");
-      return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
-    }
-  }
+    } 
 
-  public ResponseEntity<RespostaModelo> remover(long id) {
-    if (clienteRepositorio.existsById(id)) {
+    public ResponseEntity<RespostaModelo> remover(long id) {
+      if (clienteRepositorio.existsById(id)) {
       clienteRepositorio.deleteById(id);
       respostaModelo.setMensagem("O cliente foi removido com sucesso");
       return new ResponseEntity<>(respostaModelo, HttpStatus.OK);

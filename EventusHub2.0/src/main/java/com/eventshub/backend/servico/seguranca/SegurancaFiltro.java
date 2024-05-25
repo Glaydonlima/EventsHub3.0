@@ -71,7 +71,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   }
 
 
-  private boolean temPermissao(HttpServletRequest request,
+  private boolean temPermissao(HttpServletRequest request, //Isso aqui será removido
       List<SimpleGrantedAuthority> authorities) {
     String path = request.getRequestURI();
     String method = request.getMethod();
@@ -106,7 +106,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
   }
 
   @Bean
-  public List<RotasModelo> rotasModeloConfig() {
+  public List<RotasModelo> rotasModeloConfig() { //Modificar e adicionar a anotação nas proprias rotas
     List<RotasModelo> rotas = new ArrayList<>();
     rotas.add(new RotasModelo("/usuario/remover/{id}", HttpMethod.DELETE, "ADMIN"));
     rotas.add(new RotasModelo("/usuario/alterar/{id}", HttpMethod.PUT, "ROLE_USER"));

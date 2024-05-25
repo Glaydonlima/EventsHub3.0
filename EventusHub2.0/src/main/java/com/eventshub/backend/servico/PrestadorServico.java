@@ -23,7 +23,7 @@ public class PrestadorServico {
   private UsuarioRepositorio usuarioRepositorio;
 
 
-  public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao,
+  public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao, //alterar o nome dos métodos
       Long idUsuario) {
     if (prestadorModelo.getRazaoSocial() == null || prestadorModelo.getRazaoSocial().isEmpty()) {
       respostaModelo.setMensagem("A razão social é obrigatória!");

@@ -16,10 +16,13 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Table(name = "clientes")
@@ -37,9 +40,9 @@ public class ClienteModelo {
     @Pattern(regexp = "\\d{10,11}", message = "O telefone deve conter 10 ou 11 dígitos numéricos")
     private String telefone;
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @NotNull(message = "A data de nascimento não pode estar em branco")
-    private Date dataNascimento;
+    private LocalDate dataNascimento;
 
     @OneToOne
     @JoinColumn(name = "usuario_id")

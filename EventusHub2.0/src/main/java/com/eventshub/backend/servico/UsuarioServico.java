@@ -41,7 +41,7 @@ public class UsuarioServico {
     return ResponseEntity.badRequest().build();
   }
 
-  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
+  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) { //Alterar e separar a regra de Cadastrar e Alterar (Seguir modelo do Cliente Serviço)
     if (acao.equals("cadastrar")) {
       Optional<UsuarioModelo> usuario = usuarioRepositorio.findByEmail(usuarioModelo.getEmail());
       if (usuario.isEmpty()) {
