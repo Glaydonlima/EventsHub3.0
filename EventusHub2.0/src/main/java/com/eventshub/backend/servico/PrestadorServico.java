@@ -5,53 +5,64 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.PrestadorModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.PrestadorRepositorio;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+@RequiredArgsConstructor
 @Service
 public class PrestadorServico {
-  @Autowired
-  private PrestadorRepositorio prestadorRepositorio;
 
-  @Autowired
-  private RespostaModelo respostaModelo;
+  private final PrestadorRepositorio prestadorRepositorio;
 
-  @Autowired
-  private UsuarioRepositorio usuarioRepositorio;
+  private final RespostaModelo respostaModelo;
 
-  private boolean isNullOrEmpty(String str) {
-    return str == null || str.isEmpty();
-  }
+  private final UsuarioRepositorio usuarioRepositorio;
 
-  private ResponseEntity<RespostaModelo> createErrorResponse(String message) {
-    respostaModelo.setMensagem(message);
-    return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-  }
+  private final TokenServico tokenServico;
 
-  public ResponseEntity<?> alterar(PrestadorModelo prestadorModelo, Long idUsuario) {
-        if (isNullOrEmpty(prestadorModelo.getRazaoSocial())) {
-          return createErrorResponse("A razão social é obrigatória!");
+  public ResponseEntity<?> alterar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
+    Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+      Optional<PrestadorModelo> prestadorExistente = prestadorRepositorio.findById(idUsuario);
+      if (!prestadorExistente.isPresent()) {
+        respostaModelo.setMensagem("Prestador não encontrado");
+        return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
     }
-    if (isNullOrEmpty(prestadorModelo.getCpf())) {
-      return createErrorResponse("O Cpf ou Cnpj é obrigatório!");
-    }
-    if (isNullOrEmpty(prestadorModelo.getDescricaoEmpresa())) {
-      return createErrorResponse("A descrição da empresa é obrigatória!");
-    }
-    if (prestadorRepositorio.existsByCpf(prestadorModelo.getCpf())) {
-      return createErrorResponse("O Cpf ou Cnpj já está em uso!");
-    }
-      prestadorRepositorio.save(prestadorModelo);
-      return new ResponseEntity<>(prestadorModelo, HttpStatus.OK);
-  }
+    
+    PrestadorModelo prestadorExistenteAtualizado = prestadorExistente.get();
+    Optional.ofNullable(prestadorModelo.getRazaoSocial())
+        .filter(razaoSocial -> !razaoSocial.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setRazaoSocial);
+    
+    Optional.ofNullable(prestadorModelo.getCnpjCpf())
+        .filter(cnpjCpf -> !cnpjCpf.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setCnpjCpf);
 
-  public ResponseEntity<?> cadastrar(PrestadorModelo prestadorModelo, Long idUsuario) {
+    Optional.ofNullable(prestadorModelo.getDescricaoEmpresa())
+        .filter(descricaoEmpresa -> !descricaoEmpresa.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setDescricaoEmpresa);
+
+      Optional.ofNullable(prestadorModelo.getPortfolio())
+        .filter(portfolio -> !portfolio.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setPortfolio);
+
+    return new ResponseEntity<>(
+        prestadorRepositorio.save(prestadorExistenteAtualizado), HttpStatus.OK);
+    }
+  
+  public ResponseEntity<?> cadastrar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
+    Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
     UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     prestadorModelo.setUsuario(usuario);
+    prestadorModelo.setId(usuario.getId());
     return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
         HttpStatus.OK); 
 }

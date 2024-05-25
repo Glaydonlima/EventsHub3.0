@@ -43,20 +43,22 @@ public class ClienteServico {
    public ResponseEntity<?> alterar(ClienteModelo clienteModelo, HttpServletRequest request) {
       Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
       Optional<ClienteModelo> clienteExistente = clienteRepositorio.findById(idUsuario);
-      if (clienteExistente.isPresent()) {
-        ClienteModelo clienteExistenteAtualizado = clienteExistente.get();
-        if (clienteModelo.getEndereco() != null && !clienteModelo.getEndereco().isEmpty()) {
-          clienteExistenteAtualizado.setEndereco(clienteModelo.getEndereco());
-        }
-        if (clienteModelo.getTelefone() != null && !clienteModelo.getTelefone().isEmpty()) {
-          clienteExistenteAtualizado.setTelefone(clienteModelo.getTelefone());
-        }
-        return new ResponseEntity<ClienteModelo>(
-            clienteRepositorio.save(clienteExistenteAtualizado), HttpStatus.OK);
-      } else {
+      if (!clienteExistente.isPresent()) {
         respostaModelo.setMensagem("Cliente não encontrado");
-        return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.NOT_FOUND);
-      }
+        return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
+    }
+    
+    ClienteModelo clienteExistenteAtualizado = clienteExistente.get();
+    Optional.ofNullable(clienteModelo.getEndereco())
+        .filter(endereco -> !endereco.isEmpty())
+        .ifPresent(clienteExistenteAtualizado::setEndereco);
+    
+    Optional.ofNullable(clienteModelo.getTelefone())
+        .filter(telefone -> !telefone.isEmpty())
+        .ifPresent(clienteExistenteAtualizado::setTelefone);
+    
+    return new ResponseEntity<>(
+        clienteRepositorio.save(clienteExistenteAtualizado), HttpStatus.OK);
     } 
 
     public ResponseEntity<RespostaModelo> remover(long id) {

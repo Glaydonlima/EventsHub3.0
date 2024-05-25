@@ -1,6 +1,7 @@
 package com.eventshub.backend.controle;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,8 @@ import com.eventshub.backend.modelo.PrestadorModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.servico.PrestadorServico;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -24,28 +27,28 @@ public class PrestadorControle {
 
   private final PrestadorServico prestadorServico;
 
-  @PostMapping("/{id}")
-  public ResponseEntity<?> cadastrar(@RequestBody PrestadorModelo prestadorModelo,
-      @PathVariable Long idUsuario) {
-    return prestadorServico.cadastrar(prestadorModelo, idUsuario);
+  @PostMapping()
+  public ResponseEntity<?> cadastrar(@Valid @RequestBody PrestadorModelo prestadorModelo,
+      HttpServletRequest request) {
+    return prestadorServico.cadastrar(prestadorModelo, request);
   }
-
-  @PutMapping("/{id}")
-  public ResponseEntity<?> alterar(@RequestBody PrestadorModelo prestadorModelo,
-      @PathVariable Long idUsuario) {
-    return prestadorServico.alterar(prestadorModelo, idUsuario);
+  @Secured({"ROLE_PRESTADOR", "ADMIN"})
+  @PutMapping()
+  public ResponseEntity<?> alterar(@Valid @RequestBody PrestadorModelo prestadorModelo,
+  HttpServletRequest request) {
+    return prestadorServico.alterar(prestadorModelo, request);
   }
-
+  @Secured({"ROLE_PRESTADOR", "ADMIN"})
   @DeleteMapping("/{id}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable Long id) {
     return prestadorServico.remover(id);
   }
-
+  @Secured({"ROLE_PRESTADOR", "ADMIN"})
   @GetMapping("/{id}")
   public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
     return prestadorServico.buscarPorId(id);
   }
-
+  @Secured({"ROLE_PRESTADOR", "ADMIN"})
   @GetMapping("/listar")
   public Iterable<PrestadorModelo> listarClientes() {
     return prestadorServico.listar();
