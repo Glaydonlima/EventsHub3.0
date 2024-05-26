@@ -3,7 +3,6 @@ package com.eventshub.backend.servico;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,22 +14,20 @@ import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
 import com.eventshub.backend.servico.seguranca.TokenServico;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+@RequiredArgsConstructor
 @Service
 public class UsuarioServico {
 
-  @Autowired
-  private UsuarioRepositorio usuarioRepositorio;
+  private final UsuarioRepositorio usuarioRepositorio;
 
-  @Autowired
-  private RespostaModelo respostaModelo;
+  private final RespostaModelo respostaModelo;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private TokenServico tokenServico;
-
-
+  private final TokenServico tokenServico;
+  
   public ResponseEntity<?> login(UsuarioModelo usuarioModelo) {
     UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(usuarioModelo.getEmail())
         .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
@@ -41,10 +38,7 @@ public class UsuarioServico {
     return ResponseEntity.badRequest().build();
   }
 
-  public ResponseEntity<?> cadastrarAlterar(UsuarioModelo usuarioModelo, String acao, Long id) {
-    if (acao.equals("cadastrar")) {
-      Optional<UsuarioModelo> usuario = usuarioRepositorio.findByEmail(usuarioModelo.getEmail());
-      if (usuario.isEmpty()) {
+  public ResponseEntity<?> cadastrar(UsuarioModelo usuarioModelo) { 
         usuarioModelo.setSenha(passwordEncoder.encode(usuarioModelo.getSenha()));
         Set<String> roles = new HashSet<>();
         roles.add("ROLE_USER");
@@ -53,10 +47,11 @@ public class UsuarioServico {
         usuarioRepositorio.save(usuarioModelo);
         return new ResponseEntity<>(new ResponseDTO(usuarioModelo.getNome(), token),
             HttpStatus.CREATED);
-      }
-      return ResponseEntity.badRequest().build();
-    } else if (acao.equals("alterar")) {
-      Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(id);
+    } 
+
+       public ResponseEntity<?> Alterar(UsuarioModelo usuarioModelo, HttpServletRequest request){
+        Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+      Optional<UsuarioModelo> usuarioExistente = usuarioRepositorio.findById(idUsuario);
       if (usuarioExistente.isPresent()) {
         UsuarioModelo usuarioExistenteAtualizado = usuarioExistente.get();
         if (usuarioModelo.getNome() != null && !usuarioModelo.getNome().isEmpty()) {
@@ -78,10 +73,6 @@ public class UsuarioServico {
       } else {
         return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.NOT_FOUND);
       }
-    } else {
-      respostaModelo.setMensagem("Ação inválida!");
-      return new ResponseEntity<>(respostaModelo, HttpStatus.BAD_REQUEST);
-    }
   }
 
   public ResponseEntity<RespostaModelo> remover(long id) {

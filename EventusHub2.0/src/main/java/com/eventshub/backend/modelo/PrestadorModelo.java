@@ -16,15 +16,14 @@ import java.util.List;
 public class PrestadorModelo{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "A razão social é obrigatória")
     private String razaoSocial;
 
     @Column(unique = true)
-    @NotBlank(message = "CPF é obrigatório")
-    private String cpf;
+    @NotBlank(message = "CPNJ/CPF é obrigatório")
+    private String cnpjCpf;
 
     @NotBlank(message = "A descrição da empresa é obrigatória")
     private String descricaoEmpresa;

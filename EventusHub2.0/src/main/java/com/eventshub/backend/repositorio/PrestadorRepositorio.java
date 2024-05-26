@@ -8,6 +8,4 @@ import com.eventshub.backend.modelo.PrestadorModelo;
 @Repository
 public interface PrestadorRepositorio extends CrudRepository<PrestadorModelo, Long> {
 
-  boolean existsByCpf(String cpf);
-
 }

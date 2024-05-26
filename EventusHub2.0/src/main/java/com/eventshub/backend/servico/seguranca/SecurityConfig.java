@@ -22,9 +22,8 @@ import com.eventshub.backend.modelo.RotasModelo;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
 
+    
     @Autowired
     SegurancaFiltro filtro;
 

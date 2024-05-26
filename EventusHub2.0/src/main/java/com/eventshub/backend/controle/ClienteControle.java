@@ -1,7 +1,7 @@
 package com.eventshub.backend.controle;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,32 +14,38 @@ import org.springframework.web.bind.annotation.RestController;
 import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.servico.ClienteServico;
-import jakarta.validation.Valid;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/clientes")
+@RequestMapping("/v1/clientes")
 public class ClienteControle {
 
-    @Autowired
-    private ClienteServico clienteServico;
+    private final ClienteServico clienteServico;
 
-    @PostMapping("/cadastrar/{id}")
-    public ResponseEntity<?> cadastrarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long id) {
-        return clienteServico.cadastrarAlterar(clienteModelo, "cadastrar", id);
+    @PostMapping()
+    public ResponseEntity<?> cadastrarCliente(@Valid @RequestBody ClienteModelo clienteModelo, HttpServletRequest request) {
+        return clienteServico.cadastrar(clienteModelo, request);
     }
 
-    @PutMapping("/alterar/{id}")
-    public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, @PathVariable Long id) {
-        return clienteServico.cadastrarAlterar(clienteModelo, "alterar", id);
+    @Secured({"ROLE_CLIENTE", "ADMIN"})
+    @PutMapping()
+    public ResponseEntity<?> alterarCliente(@Valid @RequestBody ClienteModelo clienteModelo, HttpServletRequest request) {
+        return clienteServico.alterar(clienteModelo, request);
     }
 
-    @DeleteMapping("/remover/{id}")
-    public ResponseEntity<RespostaModelo> removerCliente(@PathVariable Long id) {
-        return clienteServico.remover(id);
+    @Secured({"ROLE_CLIENTE", "ADMIN"})
+    @DeleteMapping("/{clienteId}")
+    public ResponseEntity<RespostaModelo> removerCliente(@PathVariable Long clienteId) {
+        return clienteServico.remover(clienteId);
     }
 
-    @GetMapping("/listar")
+    @Secured({"ROLE_CLIENTE", "ADMIN"})
+    @GetMapping()
     public Iterable<ClienteModelo> listarClientes() {
         return clienteServico.listar();
     }

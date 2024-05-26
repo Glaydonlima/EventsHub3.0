@@ -1,7 +1,8 @@
 package com.eventshub.backend.servico;
 
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -10,63 +11,83 @@ import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.PrestadorRepositorio;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+@RequiredArgsConstructor
 @Service
 public class PrestadorServico {
-  @Autowired
-  private PrestadorRepositorio prestadorRepositorio;
 
-  @Autowired
-  private RespostaModelo respostaModelo;
+  private final PrestadorRepositorio prestadorRepositorio;
 
-  @Autowired
-  private UsuarioRepositorio usuarioRepositorio;
+  private final RespostaModelo respostaModelo;
 
+  private final UsuarioRepositorio usuarioRepositorio;
 
-  public ResponseEntity<?> cadastrarAlterar(PrestadorModelo prestadorModelo, String acao,
-      Long idUsuario) {
-    if (prestadorModelo.getRazaoSocial() == null || prestadorModelo.getRazaoSocial().isEmpty()) {
-      respostaModelo.setMensagem("A razão social é obrigatória!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+  private final TokenServico tokenServico;
+
+  public ResponseEntity<?> alterar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
+  try{
+    Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+      Optional<PrestadorModelo> prestadorExistente = prestadorRepositorio.findById(idUsuario);
+      if (!prestadorExistente.isPresent()) {
+        respostaModelo.setMensagem("Prestador não encontrado");
+        return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
     }
-    if (prestadorModelo.getCpf() == null || prestadorModelo.getCpf().isEmpty()) {
-      respostaModelo.setMensagem("O Cpf ou Cnpj é obrigatório!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    }
-    if (prestadorModelo.getDescricaoEmpresa() == null
-        || prestadorModelo.getDescricaoEmpresa().isEmpty()) {
-      respostaModelo.setMensagem("A descrição da empresa é obrigatória!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    }
-    if (prestadorRepositorio.existsByCpf(prestadorModelo.getCpf())) {
-      respostaModelo.setMensagem("O Cpf ou Cnpj já está em uso!");
-      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
-    }
-    if (acao.equalsIgnoreCase("cadastrar")) {
-      UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
-          .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-      prestadorModelo.setUsuario(usuario);
-      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
-          HttpStatus.OK);
-    } else if (acao.equalsIgnoreCase("alterar")) {
-      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
-          HttpStatus.OK);
-    } else {
-      return ResponseEntity.badRequest().body("Ação inválida");
-    }
+    
+    PrestadorModelo prestadorExistenteAtualizado = prestadorExistente.get();
+    Optional.ofNullable(prestadorModelo.getRazaoSocial())
+        .filter(razaoSocial -> !razaoSocial.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setRazaoSocial);
+    
+    Optional.ofNullable(prestadorModelo.getCnpjCpf())
+        .filter(cnpjCpf -> !cnpjCpf.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setCnpjCpf);
+
+    Optional.ofNullable(prestadorModelo.getDescricaoEmpresa())
+        .filter(descricaoEmpresa -> !descricaoEmpresa.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setDescricaoEmpresa);
+
+      Optional.ofNullable(prestadorModelo.getPortfolio())
+        .filter(portfolio -> !portfolio.isEmpty())
+        .ifPresent(prestadorExistenteAtualizado::setPortfolio);
+
+    return new ResponseEntity<>(
+        prestadorRepositorio.save(prestadorExistenteAtualizado), HttpStatus.OK);
+    } catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);}
   }
+  
+  public ResponseEntity<?> cadastrar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
+  try{
+    Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+    UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
+        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+          Set<String> roles = usuario.getRoles();
+            roles.add("ROLE_PRESTADOR");
+            usuario.setRoles(roles);
+            usuarioRepositorio.save(usuario);
+      prestadorModelo.setUsuario(usuario);
+      prestadorModelo.setId(usuario.getId());
+      return new ResponseEntity<PrestadorModelo>(prestadorRepositorio.save(prestadorModelo),
+        HttpStatus.OK);
+      }catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);}      
+}
 
 
-  public ResponseEntity<RespostaModelo> remover(long id) {
-    if (prestadorRepositorio.existsById(id)) {
-      prestadorRepositorio.deleteById(id);
+public ResponseEntity<RespostaModelo> remover(long id) {
+  long countBeforeDelete = prestadorRepositorio.count();
+  prestadorRepositorio.deleteById(id);
+  long countAfterDelete = prestadorRepositorio.count();
+
+  if (countBeforeDelete > countAfterDelete) {
       respostaModelo.setMensagem("O prestador foi removido com sucesso");
       return new ResponseEntity<>(respostaModelo, HttpStatus.OK);
-    } else {
+  } else {
       respostaModelo.setMensagem("Prestador não encontrado");
       return new ResponseEntity<>(respostaModelo, HttpStatus.NOT_FOUND);
-    }
   }
+}
 
   public Iterable<PrestadorModelo> listar() {
     return prestadorRepositorio.findAll();
