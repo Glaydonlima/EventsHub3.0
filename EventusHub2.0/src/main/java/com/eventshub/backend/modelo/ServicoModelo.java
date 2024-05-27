@@ -2,6 +2,8 @@ package com.eventshub.backend.modelo;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,14 +33,19 @@ public class ServicoModelo {
 
     @ManyToOne
     @JoinColumn(name = "prestador_id")
+    @JsonIgnore
     private PrestadorModelo prestador;
 
     @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SolicitacaoModelo> solicitacoes;
 
     @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<PagamentoModelo> pagamentos;
 
     @OneToMany(mappedBy = "servico", cascade = CascadeType.ALL)
     private List<FotoModelo> fotos;
+
+    
 }

@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "prestadores")
 @Data
@@ -32,12 +34,14 @@ public class PrestadorModelo{
 
     @OneToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnore
     private UsuarioModelo usuario;
 
     @OneToMany(mappedBy = "prestador", cascade = CascadeType.ALL)
     private List<ServicoModelo> servicos;
 
     @OneToMany(mappedBy = "prestador", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<PagamentoModelo> pagamentos;
 
 }

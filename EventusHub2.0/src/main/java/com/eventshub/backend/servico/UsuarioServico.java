@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.eventshub.backend.dto.LoginRequestDTO;
 import com.eventshub.backend.dto.ResponseDTO;
-import com.eventshub.backend.dto.UserRegisterRequestDTO;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
@@ -18,6 +17,7 @@ import com.eventshub.backend.servico.seguranca.TokenServico;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @Service
 public class UsuarioServico {
@@ -41,6 +41,10 @@ public class UsuarioServico {
   }
 
   public ResponseEntity<?> cadastrar(UsuarioModelo usuarioModelo) { 
+    if (usuarioRepositorio.existsByEmail(usuarioModelo.getEmail())) {
+      respostaModelo.setMensagem("O email já está cadastrado!");
+      return new ResponseEntity<RespostaModelo>(respostaModelo, HttpStatus.BAD_REQUEST);
+    }
         usuarioModelo.setSenha(passwordEncoder.encode(usuarioModelo.getSenha()));
         Set<String> roles = new HashSet<>();
         roles.add("ROLE_USER");

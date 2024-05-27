@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "clientes")
@@ -34,6 +35,7 @@ public class ClienteModelo {
     
     @OneToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnore
     private UsuarioModelo usuario;
     
     @NotBlank(message = "O endereço não pode estar em branco")

@@ -61,6 +61,10 @@ public class PrestadorServico {
   public ResponseEntity<?> cadastrar(PrestadorModelo prestadorModelo, HttpServletRequest request) {
   try{
     Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+    Optional<PrestadorModelo> prestadorExistente = prestadorRepositorio.findById(idUsuario);
+    if (prestadorExistente.isPresent()) {
+      respostaModelo.setMensagem("Prestador já cadastrado");
+      return new ResponseEntity<>(respostaModelo,HttpStatus.BAD_REQUEST);}
     UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
         .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
           Set<String> roles = usuario.getRoles();

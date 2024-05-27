@@ -30,7 +30,7 @@ public class SegurancaFiltro extends OncePerRequestFilter {
 
   @Override
 protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest request, @SuppressWarnings("null") HttpServletResponse response, @SuppressWarnings("null") FilterChain filterChain) throws ServletException, IOException {
-    var token = recuperarToken(request);
+  var token = tokenServico.recuperarToken(request);
     if (token != null) {
         var login = tokenServico.validarToken(token);
         if (login != null) {
@@ -49,13 +49,6 @@ protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest req
     }
     filterChain.doFilter(request, response);
 }
- 
-  private String recuperarToken(HttpServletRequest request) {
-    var authHeader = request.getHeader("Authorization");
-    if (authHeader == null)
-      return null;
-    return authHeader.replace("Bearer ", "");
-  }
 
   private void enviarRespostaErro(HttpServletResponse response, String mensagem)
       throws IOException {

@@ -2,6 +2,8 @@ package com.eventshub.backend.modelo;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,14 +33,17 @@ public class PagamentoModelo {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
+    @JsonIgnore
     private ClienteModelo cliente;
 
     @ManyToOne
     @JoinColumn(name = "prestador_id")
+    @JsonIgnore
     private PrestadorModelo prestador;
 
     @ManyToOne
     @JoinColumn(name = "servico_id")
+    @JsonIgnore
     private ServicoModelo servico;
 
 }

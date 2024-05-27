@@ -1,22 +1,47 @@
 package com.eventshub.backend.servico;
 
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.eventshub.backend.modelo.SolicitacaoModelo;
-import com.eventshub.backend.repositorio.SolicitacaoRepositorio;
+import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.eventshub.backend.modelo.ClienteModelo;
+import com.eventshub.backend.modelo.PrestadorModelo;
+import com.eventshub.backend.modelo.SolicitacaoModelo;
+import com.eventshub.backend.repositorio.ClienteRepositorio;
+import com.eventshub.backend.repositorio.SolicitacaoRepositorio;
+import com.eventshub.backend.servico.seguranca.TokenServico;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class SolicitacaoServico {
 
-   @Autowired
-    private SolicitacaoRepositorio solicitacaoRepositorio;
+   
+    private final SolicitacaoRepositorio solicitacaoRepositorio;
 
-    public SolicitacaoModelo salvarSolicitacao(SolicitacaoModelo solicitacao) {
-        solicitacao.setDataCriacao(LocalDateTime.now());
-        solicitacao.setDataAtualizacao(LocalDateTime.now());
-        return solicitacaoRepositorio.save(solicitacao);
+    private final TokenServico tokenServico;
+
+    private final ClienteRepositorio clienteRepositorio;
+
+    public ResponseEntity<?> cadastrarSolicitacao(SolicitacaoModelo solicitacao, HttpServletRequest request) {
+        try{
+        Long idCliente = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
+        ClienteModelo cliente = clienteRepositorio.findById(idCliente)
+          .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+          solicitacao.setCliente(cliente);
+          solicitacao.setDataCriacao(LocalDateTime.now());
+          solicitacao.setDataAtualizacao(LocalDateTime.now());
+          return new ResponseEntity<>(solicitacaoRepositorio.save(solicitacao), HttpStatus.CREATED);
+
+          } catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+          }
     }
+
     public SolicitacaoModelo atualizarSolicitacao(SolicitacaoModelo solicitacao) {
       solicitacao.setDataAtualizacao(LocalDateTime.now());
       return solicitacaoRepositorio.save(solicitacao);
