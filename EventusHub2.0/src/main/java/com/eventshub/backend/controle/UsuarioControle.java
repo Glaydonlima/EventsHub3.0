@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.eventshub.backend.dto.LoginRequestDTO;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.servico.UsuarioServico;
@@ -36,17 +38,17 @@ public class UsuarioControle {
 
 
   @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestBody UsuarioModelo usuarioModelo) {
-    return usuarioServico.login(usuarioModelo);
+  public ResponseEntity<?> login(@RequestBody LoginRequestDTO usuarioDto) {
+    return usuarioServico.login(usuarioDto);
   }
 
-  @Secured({"ROLE_CLIENTE", "ADMIN"})
+  @Secured({"ROLE_USER", "ADMIN"})
   @DeleteMapping("/{usuarioId}")
   public ResponseEntity<RespostaModelo> remover(@PathVariable long id) {
     return usuarioServico.remover(id);
   }
 
-  @Secured({"ROLE_CLIENTE", "ADMIN"})
+  @Secured({"ROLE_USER", "ADMIN"})
   @PutMapping("/{id}")
   public ResponseEntity<?> alterar(@RequestBody UsuarioModelo usuarioModelo, HttpServletRequest request) {
     return usuarioServico.Alterar(usuarioModelo, request
@@ -58,7 +60,7 @@ public class UsuarioControle {
     return usuarioServico.cadastrar(usuarioModelo);
   }
 
-  @Secured({"ROLE_CLIENTE"})
+  @Secured({"ADMIN"})
   @GetMapping("/listar")
   public Iterable<UsuarioModelo> listar() {
     return usuarioServico.listar();

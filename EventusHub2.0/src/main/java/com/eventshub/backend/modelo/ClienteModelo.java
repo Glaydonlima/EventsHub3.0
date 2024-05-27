@@ -25,19 +25,19 @@ public class ClienteModelo {
     @Id
     private Long id;
 
-    @NotBlank(message = "O endereço não pode estar em branco")
-    private String endereco;
-
     @Pattern(regexp = "\\d{10,11}", message = "O telefone deve conter 10 ou 11 dígitos numéricos")
     private String telefone;
-
+    
     @JsonFormat(pattern = "dd/MM/yyyy")
     @NotNull(message = "A data de nascimento não pode estar em branco")
     private LocalDate dataNascimento;
-
+    
     @OneToOne
     @JoinColumn(name = "usuario_id")
     private UsuarioModelo usuario;
+    
+    @NotBlank(message = "O endereço não pode estar em branco")
+    private String endereco;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<PagamentoModelo> pagamentos;

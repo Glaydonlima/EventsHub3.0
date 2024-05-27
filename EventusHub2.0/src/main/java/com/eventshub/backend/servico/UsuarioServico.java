@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.eventshub.backend.dto.LoginRequestDTO;
 import com.eventshub.backend.dto.ResponseDTO;
+import com.eventshub.backend.dto.UserRegisterRequestDTO;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
@@ -28,10 +30,10 @@ public class UsuarioServico {
 
   private final TokenServico tokenServico;
   
-  public ResponseEntity<?> login(UsuarioModelo usuarioModelo) {
-    UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(usuarioModelo.getEmail())
+  public ResponseEntity<?> login(LoginRequestDTO usuarioDto) {
+    UsuarioModelo usuario = this.usuarioRepositorio.findByEmail(usuarioDto.email())
         .orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
-    if (passwordEncoder.matches(usuarioModelo.getSenha(), usuario.getSenha())) {
+    if (passwordEncoder.matches(usuarioDto.senha(), usuario.getSenha())) {
       String token = this.tokenServico.geradorToken(usuario);
       return ResponseEntity.ok(new ResponseDTO(usuario.getNome(), token));
     }

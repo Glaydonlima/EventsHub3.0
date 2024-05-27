@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,19 +17,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.eventshub.backend.modelo.RotasModelo;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
-
-    
     @Autowired
     SegurancaFiltro filtro;
 
-    @Autowired
-    private List<RotasModelo> rotasModeloConfig;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,14 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    rotasModeloConfig.forEach(rota -> {
-                        if (rota.getMetodo() != null && rota.getRota() != null
-                                && !rota.getRota().isEmpty()) {
-                            auth.requestMatchers(rota.getMetodo(), rota.getRota())
-                                    .hasRole(rota.getAutorizacao());
-                        }
-                    });
-                    auth.requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login")
+                    auth.requestMatchers(HttpMethod.POST, "/usuario", "/usuario/login")
                             .permitAll();
                     auth.anyRequest().authenticated();
                 })

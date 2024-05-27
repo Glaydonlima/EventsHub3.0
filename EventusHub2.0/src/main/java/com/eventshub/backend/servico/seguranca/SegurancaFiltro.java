@@ -49,6 +49,7 @@ protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest req
     }
     filterChain.doFilter(request, response);
 }
+ 
   private String recuperarToken(HttpServletRequest request) {
     var authHeader = request.getHeader("Authorization");
     if (authHeader == null)
