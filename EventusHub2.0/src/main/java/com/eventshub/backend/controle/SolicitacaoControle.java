@@ -3,23 +3,21 @@ package com.eventshub.backend.controle;
 import com.eventshub.backend.modelo.SolicitacaoModelo;
 import com.eventshub.backend.servico.SolicitacaoServico;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("v1/solicitacoes")
+@RequestMapping("/v1/solicitacoes")
 public class SolicitacaoControle {
 
     private final SolicitacaoServico solicitacaoServico;
 
-    public SolicitacaoControle(SolicitacaoServico solicitacaoServico) {
-        this.solicitacaoServico = solicitacaoServico;
-    }
-
-    @PostMapping()
-    public ResponseEntity<?> salvarSolicitacao(@RequestBody SolicitacaoModelo solicitacao, HttpServletRequest request) {
-        return solicitacaoServico.cadastrarSolicitacao(solicitacao, request);
+    @PostMapping("/cadastrar/{idServico}")
+    public ResponseEntity<?> salvarSolicitacao(@RequestBody SolicitacaoModelo solicitacao, @PathVariable Long servicoId,HttpServletRequest request) {
+        return solicitacaoServico.cadastrarSolicitacao(solicitacao,servicoId, request);
     }
 
     @PutMapping()

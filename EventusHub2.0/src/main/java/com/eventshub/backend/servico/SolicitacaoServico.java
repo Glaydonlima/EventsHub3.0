@@ -8,9 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.eventshub.backend.modelo.ClienteModelo;
-import com.eventshub.backend.modelo.PrestadorModelo;
+import com.eventshub.backend.modelo.ServicoModelo;
 import com.eventshub.backend.modelo.SolicitacaoModelo;
 import com.eventshub.backend.repositorio.ClienteRepositorio;
+import com.eventshub.backend.repositorio.ServicoRepositorio;
 import com.eventshub.backend.repositorio.SolicitacaoRepositorio;
 import com.eventshub.backend.servico.seguranca.TokenServico;
 
@@ -28,14 +29,18 @@ public class SolicitacaoServico {
 
     private final ClienteRepositorio clienteRepositorio;
 
-    public ResponseEntity<?> cadastrarSolicitacao(SolicitacaoModelo solicitacao, HttpServletRequest request) {
+    private final ServicoRepositorio servicoRepositorio;
+
+    public ResponseEntity<?> cadastrarSolicitacao(SolicitacaoModelo solicitacao, Long idServico, HttpServletRequest request) {
         try{
+        ServicoModelo servico = servicoRepositorio.findById(idServico).orElseThrow(() -> new RuntimeException("Servico não encontrado"));
         Long idCliente = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
         ClienteModelo cliente = clienteRepositorio.findById(idCliente)
           .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
           solicitacao.setCliente(cliente);
           solicitacao.setDataCriacao(LocalDateTime.now());
           solicitacao.setDataAtualizacao(LocalDateTime.now());
+          solicitacao.setServico(servico);
           return new ResponseEntity<>(solicitacaoRepositorio.save(solicitacao), HttpStatus.CREATED);
 
           } catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

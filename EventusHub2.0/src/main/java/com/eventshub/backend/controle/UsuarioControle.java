@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/usuario")
+@RequestMapping("/v1/usuario")
 public class UsuarioControle {
 
   private final UsuarioServico usuarioServico;
