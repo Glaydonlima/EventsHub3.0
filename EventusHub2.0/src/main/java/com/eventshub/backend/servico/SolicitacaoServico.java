@@ -21,15 +21,13 @@ public class SolicitacaoServico {
 
    
     private final SolicitacaoRepositorio solicitacaoRepositorio;
-
     private final TokenServico tokenServico;
-
     private final ClienteRepositorio clienteRepositorio;
-
     private final ServicoRepositorio servicoRepositorio;
 
     public ResponseEntity<?> cadastrarSolicitacao(final SolicitacaoModelo solicitacao, final Long idServico, final HttpServletRequest request) { 
         try {
+            
             final Optional<ServicoModelo> optionalServico = servicoRepositorio.findById(idServico);
             if (!optionalServico.isPresent()) {
                 return new ResponseEntity<>("Servico não encontrado", HttpStatus.NOT_FOUND);

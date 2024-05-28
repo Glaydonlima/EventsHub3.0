@@ -26,7 +26,7 @@ public class ClienteModelo {
     @Id
     private Long id;
 
-    @Pattern(regexp = "\\d{10,11}", message = "O telefone deve conter 10 ou 11 dígitos numéricos")
+    @Pattern(regexp = "\\d{10,11}", message = "O telefone deve conter 10 ou 11 dígitos Ex: 81999999999")
     private String telefone;
     
     @JsonFormat(pattern = "dd/MM/yyyy")
