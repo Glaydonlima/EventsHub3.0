@@ -2,18 +2,17 @@ package com.eventshub.backend.servico;
 
 import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.eventshub.backend.controle.Exceptions.UsuarioNaoEncontradoException;
 import com.eventshub.backend.modelo.ClienteModelo;
 import com.eventshub.backend.modelo.RespostaModelo;
 import com.eventshub.backend.modelo.UsuarioModelo;
 import com.eventshub.backend.repositorio.ClienteRepositorio;
 import com.eventshub.backend.repositorio.UsuarioRepositorio;
 import com.eventshub.backend.servico.seguranca.TokenServico;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
@@ -31,22 +30,34 @@ public class ClienteServico {
   
   private final TokenServico tokenServico;
 
-   public ResponseEntity<?> cadastrar(ClienteModelo clienteModelo,  HttpServletRequest request) {
-
-    try{
+  public ResponseEntity<?> cadastrar(ClienteModelo clienteModelo, HttpServletRequest request) {
+    try {
+        
         Long idUsuario = tokenServico.extrairIdUsuarioDoToken(tokenServico.recuperarToken(request));
-        UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
-          .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-          Set<String> roles = usuario.getRoles();
-          roles.add("ROLE_CLIENTE");
-          usuario.setRoles(roles);
-          usuarioRepositorio.save(usuario);
-          clienteModelo.setUsuario(usuario);
-          clienteModelo.setId(usuario.getId());
-          return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
 
-          } catch(Exception e){return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);}
-   }
+        
+        UsuarioModelo usuario = usuarioRepositorio.findById(idUsuario)
+            .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));
+
+        
+        Set<String> roles = usuario.getRoles();
+        roles.add("ROLE_CLIENTE");
+        usuario.setRoles(roles);
+
+        
+        usuarioRepositorio.save(usuario);
+
+        
+        clienteModelo.setUsuario(usuario);
+        clienteModelo.setId(usuario.getId());
+
+        
+        return new ResponseEntity<>(clienteRepositorio.save(clienteModelo), HttpStatus.CREATED);
+    } catch (Exception e) {
+        
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
 
    public ResponseEntity<?> alterar(ClienteModelo clienteModelo, HttpServletRequest request) {
     try{
@@ -90,7 +101,5 @@ public class ClienteServico {
   public Iterable<ClienteModelo> listar() {
     return clienteRepositorio.findAll();
   }
-
-
 
 }
