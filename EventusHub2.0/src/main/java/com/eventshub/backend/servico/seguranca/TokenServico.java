@@ -26,7 +26,7 @@ public class TokenServico {
 
   public String geradorToken(UsuarioModelo usuario) {
     try {
-      Algorithm algoritimo = Algorithm.HMAC256("segredo");
+      Algorithm algoritimo = Algorithm.HMAC256("segredo"); // Criar variavel de ambiente para retirar a chave hardcoded, evitando acesso não autorizado
       String token = JWT.create().withIssuer("EventsHub2.0").withSubject(usuario.getEmail())
           .withClaim("roles", getRoles(usuario))
           .withExpiresAt(this.expiradorJWT()).sign(algoritimo);

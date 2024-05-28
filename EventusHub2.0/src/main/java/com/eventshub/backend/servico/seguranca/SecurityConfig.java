@@ -34,6 +34,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.POST, "/v1/usuario", "/v1/usuario/login")
                             .permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/v1/servicos", "v1/servicos/{servicoId}")
+                        .permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(
